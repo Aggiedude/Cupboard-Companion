@@ -5,7 +5,7 @@
 # Andrew Chepey
 import urllib2, base64, json, re, os
 
-BING_KEY = '20Te5NY5OKBOMmg1iZvjyDnVBYzAvcpi8pCUtanAm0A'
+BING_KEY = ''
 username = 'user'
 numDocs = 0
 
