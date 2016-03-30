@@ -23,9 +23,17 @@ def process_request(url):
 	results = json.load(response)
 	return results
 
-def evaluate_recipe(recipeID, yummlyCredentials):
+def get_recipe(recipeID, yummlyCredentials):
 	recipeURL = 'http://api.yummly.com/v1/api/recipe/%s?%s' % (recipeID, yummlyCredentials)
+	recipeInfo = process_request(recipeURL)
+	return recipeInfo
 	
+def evaluate_recipe(recipe):
+	recipeName = recipe['name']
+	recipeTime = str(recipe['totalTimeInSeconds'])
+	numIngredients = str(len(recipe['ingredientLines']))
+	importantInfo = "The recipe " + recipeName + " has " + numIngredients + " ingredients and takes " + recipeTime + " seconds to make."
+	return importantInfo
 	
 	
 def main():
@@ -41,11 +49,18 @@ def main():
 	url = 'http://api.yummly.com/v1/api/recipes?%s&%s' % (yummlyCredentials, searchParamenters)
 	results = process_request(url)
 	
-	decoded = re.sub(r'\W+', ' ', results)
+	comlpeteRecipes = []
+	for item in results["matches"]:
+		#print item['id']
+		comlpeteRecipes.append(get_recipe(item['id'], yummlyCredentials))
+		
+	recipeDetails = []
+	for item in comlpeteRecipes:
+		recipeDetails.append(evaluate_recipe(item))
 	
+	print recipeDetails
 	
-	
-	print decoded
+	#print results
 	
 if __name__ == '__main__':
 	main()
