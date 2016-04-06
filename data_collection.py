@@ -4,6 +4,8 @@ import string
 import base64
 import re
 
+scored_recipes = []
+
 def replace_chars(query):
 	query = string.replace(query, "'", '%27')
 	query = string.replace(query, '"', '%27')
@@ -29,12 +31,28 @@ def get_recipe(recipeID, yummlyCredentials):
 	return recipeInfo
 	
 def evaluate_recipe(recipe):
-	recipeName = recipe['name']
-	recipeTime = str(recipe['totalTimeInSeconds'])
-	numIngredients = str(len(recipe['ingredientLines']))
+	recipeName = recipe['name'].encode('ascii','ignore')
+	recipeTime = str(recipe['totalTimeInSeconds']).encode('ascii','ignore')
+	numIngredients = str(len(recipe['ingredientLines'])).encode('ascii','ignore')
+	flavors = recipe['flavors']
+
+	scored_recipes.append((recipeName,evaluate_simplicity(numIngredients,recipeTime)))
+
 	importantInfo = "The recipe " + recipeName + " has " + numIngredients + " ingredients and takes " + recipeTime + " seconds to make."
-	return importantInfo
-	
+	return importantInfo 
+
+def evaluate_simplicity(numIng, recipeTime):
+	alpha = 0.6
+	beta = 0.001
+
+	return alpha*int(numIng) + beta*int(recipeTime)
+
+def printResults(query):
+	print 'The simplest recipes for the query ' + query + ' is the following:'
+	i = 0
+	while i < len(scored_recipes):
+		print str(i+1) + '. ' + str(scored_recipes[i])
+		i += 1
 	
 def main():
 	#credentials structure: _app_id=app-id&_app_key=app-key
@@ -58,7 +76,12 @@ def main():
 	for item in comlpeteRecipes:
 		recipeDetails.append(evaluate_recipe(item))
 	
-	print recipeDetails
+	for detail in recipeDetails:
+		print detail
+	
+	scored_recipes.sort(key=lambda number: number[-1])
+
+	printResults(query)
 	
 	#print results
 	
