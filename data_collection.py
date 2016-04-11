@@ -140,12 +140,12 @@ def main(argv):
 	with open(queryTextFile) as f:
 		for line in f:
 			line = line.lower()
-			allowedIngredients.append(line)
+			allowedIngredients.append(line.strip())
 			
 	urlQuery = "q=Food+Network"
 	urlIngredients = ''
 	for ing in allowedIngredients:
-		urlIngredients = urlIngredients + '&allowedIngredient[]=%s' % ing
+		urlIngredients = urlIngredients + '&allowedIngredient[]=%s' % ing.strip()
 
 	recipeSource = "&allowedSource=Food+Network"
 
