@@ -1,8 +1,4 @@
-import urllib2
-import json
-import string
-import base64
-import re
+import urllib2, json, string, base64, re, sys
 
 scored_recipes = []
 
@@ -54,13 +50,17 @@ def printResults(query):
 		print str(i+1) + '. ' + str(scored_recipes[i])
 		i += 1
 	
-def main():
+def main(argv):
 	#credentials structure: _app_id=app-id&_app_key=app-key
 	yummlyAppID = "1a10b2e0"
 	yummlyAppKey = "72595b3dee46471a8a93caa35baf8ef1"
 	yummlyCredentials = '%s=%s&%s=%s' % ('_app_id', yummlyAppID, '_app_key', yummlyAppKey)
+
+	queryTextFile = argv[0]
+	f = open(queryTextFile)
+	query = f.read().lower()
 	
-	query = "'fish tacos'"
+	query = "'%s'" % query
 	urlQuery = 'q=' + replace_chars(query)
 	searchParamenters = urlQuery
 	
@@ -86,4 +86,4 @@ def main():
 	#print results
 	
 if __name__ == '__main__':
-	main()
+	main(sys.argv[1:]) # ignores passing the file named
