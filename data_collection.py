@@ -3,7 +3,9 @@ from bs4 import BeautifulSoup
 from textstat.textstat import textstat
 
 scored_recipes = []
-ingrList = []
+allowedIngredients = []
+mainIngredientRecipes = []
+commonCupboard = ['salt','egg','eggs','butter','oil','sugar','granulated sugar','pepper','garlic','milk','all-purpose flour','flour','water']
 
 # replaces common characters in URL queries with appropriately formatted characters
 def replace_chars(query):
@@ -37,7 +39,12 @@ def flesch_kincaid_score(text):
 
 	return (0.39*(wordCount/sentenceCount)+11.8*(sylCount/wordCount) - 15.59)
 
-def num_on_hand
+def ing_on_hand(onHand,inRecipe):
+	onHandList = []
+	onHandList.extend(onHand)
+	onHandList.extend(commonCupboard)
+	onHandIngredients = [x for x in onHandList for y in inRecipe if x in y.split() if len(y) > 1]
+	return onHandIngredients
 
 # Calls the Yummly API to get details of a specific recipe
 def get_recipe(recipeID, yummlyCredentials):
@@ -67,6 +74,17 @@ def evaluate_recipe(recipe):
 	recipeName = recipe['name'].encode('ascii','ignore')
 	print "evaluating %s" % recipeName
 	
+	sourceDict = recipe['source']
+	sourceName = sourceDict['sourceDisplayName'].encode('ascii','ignore')
+	directionsText = ""
+
+	# currently, only Food Network sources work. 
+	if "Food Network" in sourceName:
+		directionsText = get_directions(sourceDict['sourceRecipeUrl'])
+		print directionsText
+	else:
+		return
+
 	prepTime = 0
 	if 'prepTimeInSeconds' in recipe:
 		prepTime = recipe['prepTimeInSeconds']
@@ -78,39 +96,34 @@ def evaluate_recipe(recipe):
 		if prepTime == 0: # API returned non-specific cooking time
 			cookTime = recipe['totalTimeInSeconds'] # will use total time as cook time in algorithm instead
 
-	numIngredients = len(recipe['ingredientLines'])
+	ingredientList = recipe['ingredientLines']
+	numTotalIngredients = len(ingredientList)
+	ingOnHand = ing_on_hand(allowedIngredients, mainIngredientRecipes[mainIngredientRecipes.index(recipe['id'])+1])
+	numMissingIngr = numTotalIngredients - len(ingOnHand)
+
 	flavors = recipe['flavors']
 
-	sourceDict = recipe['source']
-	sourceName = sourceDict['sourceDisplayName'].encode('ascii','ignore')
-	directionsText = ""
-
-	# currently, only Food Network sources work. 
-	if "Food Network" in sourceName:
-		directionsText = get_directions(sourceDict['sourceRecipeUrl'])
-		print directionsText
-
 	if directionsText:
-		simplicityScore = evaluate_simplicity(numIngredients,prepTime,cookTime,directionsText)
+		simplicityScore = evaluate_simplicity(numTotalIngredients,prepTime,cookTime,numMissingIngr,directionsText)
 		scored_recipes.append((recipeName,simplicityScore))
 
 # Assigns a score to a recipe based upon a number of factors 
-def evaluate_simplicity(numIng, prepTime, cookTime, directionsText):
+def evaluate_simplicity(numIng, prepTime, cookTime, numMissingIngr, directionsText):
 	numIngConst = 0.6
-	prepConst = 0.002
+	prepConst = 0.0015
 	cookConst = 0.001
+	missingIngrConst = 2.0
 	fkConst = 0.5
 	stepsConst = 0.3
-	notOnHandConst = 2.0
 
 	fkScore = flesch_kincaid_score(directionsText)
 	numSteps = len([s.strip() for s in directionsText.splitlines()])
 
 
-	return numIngConst*numIng + prepConst*prepTime + cookConst*cookTime + fkConst*fkScore + stepsConst*numSteps
+	return numIngConst*numIng + prepConst*prepTime + cookConst*cookTime + missingIngrConst*numMissingIngr + fkConst*fkScore + stepsConst*numSteps
 
 def printResults(ingList):
-	print 'The simplest recipes for the ingredients ' + str(ingList) + ' is the following:'
+	print 'The simplest recipes for the ingredients ' + str(ingList) + ' are the following:'
 	i = 0
 	while i < len(scored_recipes):
 		print str(i+1) + '. ' + str(scored_recipes[i])
@@ -124,7 +137,6 @@ def main(argv):
 
 	queryTextFile = argv[0]
 	
-	allowedIngredients = []
 	with open(queryTextFile) as f:
 		for line in f:
 			line = line.lower()
@@ -146,6 +158,8 @@ def main(argv):
 	completeRecipes = []
 	for item in results["matches"]:
 		#print item['id']
+		mainIngredientRecipes.append(item['id'])
+		mainIngredientRecipes.append(item['ingredients'])
 		completeRecipes.append(get_recipe(item['id'], yummlyCredentials))
 		
 	# evaluate the simplicity for every recipe gathered
@@ -154,7 +168,7 @@ def main(argv):
 	
 	scored_recipes.sort(key=lambda number: number[-1])
 
-	printResults(ingrList)
+	printResults(allowedIngredients)
 	
 	#print results
 	
