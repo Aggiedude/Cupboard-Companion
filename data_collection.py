@@ -1,4 +1,5 @@
 import urllib2, json, string, base64, re, sys
+from bs4 import BeautifulSoup
 
 scored_recipes = []
 
@@ -25,12 +26,36 @@ def get_recipe(recipeID, yummlyCredentials):
 	recipeURL = 'http://api.yummly.com/v1/api/recipe/%s?%s' % (recipeID, yummlyCredentials)
 	recipeInfo = process_request(recipeURL)
 	return recipeInfo
+
+# currently only works with recipes taken from foodnetwork.com
+def get_directions(url):
+	page = urllib2.urlopen(url)
+	soup = BeautifulSoup(page, "html.parser")
+
+	direction_soup = soup.find_all(itemprop='recipeInstructions')[0].p
+	directions = direction_soup.get_text() + "\n"
+	siblings = direction_soup.find_next_siblings("p")
+	siblings = siblings[:-2]
+
+	for sibling in siblings:
+		directions += sibling.get_text() + "\n"
+
+	return directions
 	
 def evaluate_recipe(recipe):
 	recipeName = recipe['name'].encode('ascii','ignore')
 	recipeTime = str(recipe['totalTimeInSeconds']).encode('ascii','ignore')
 	numIngredients = str(len(recipe['ingredientLines'])).encode('ascii','ignore')
 	flavors = recipe['flavors']
+	sourceDict = recipe['source']
+	sourceName = sourceDict['sourceDisplayName'].encode('ascii','ignore')
+	print sourceName
+	directions = ""
+
+	# currently, only Food Network sources work. 
+	if "Food Network" in sourceName:
+		directions = get_directions(sourceDict['sourceRecipeUrl'])
+		print directions
 
 	scored_recipes.append((recipeName,evaluate_simplicity(numIngredients,recipeTime)))
 
@@ -62,25 +87,28 @@ def main(argv):
 	query = ''
 	
 	query = "'%s'" % query
-	urlQuery = 'q=' + replace_chars(query)
+	#urlQuery = 'q=' + replace_chars(query)
+	urlQuery = "q=Food+Network"
 	allowedIngredients = ['chicken']
 	urlIngredients = ''
 	for ing in allowedIngredients:
 		urlIngredients = urlIngredients + '&allowedIngredient[]=%s' % ing
 
-	searchParamenters = urlQuery + urlIngredients
+	recipeSource = "&allowedSource=Food+Network"
+
+	searchParamenters = urlQuery + urlIngredients + recipeSource
 	#print searchParamenters
 	
 	url = 'http://api.yummly.com/v1/api/recipes?%s&%s' % (yummlyCredentials, searchParamenters)
 	results = process_request(url)
 	
-	comlpeteRecipes = []
+	completeRecipes = []
 	for item in results["matches"]:
 		#print item['id']
-		comlpeteRecipes.append(get_recipe(item['id'], yummlyCredentials))
+		completeRecipes.append(get_recipe(item['id'], yummlyCredentials))
 		
 	recipeDetails = []
-	for item in comlpeteRecipes:
+	for item in completeRecipes:
 		recipeDetails.append(evaluate_recipe(item))
 	
 	for detail in recipeDetails:
