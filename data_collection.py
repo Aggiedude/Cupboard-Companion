@@ -56,13 +56,20 @@ def main(argv):
 	yummlyAppKey = "72595b3dee46471a8a93caa35baf8ef1"
 	yummlyCredentials = '%s=%s&%s=%s' % ('_app_id', yummlyAppID, '_app_key', yummlyAppKey)
 
-	queryTextFile = argv[0]
-	f = open(queryTextFile)
-	query = f.read().lower()
+	#queryTextFile = argv[0]
+	#f = open(queryTextFile)
+	#query = f.read().lower()
+	query = ''
 	
 	query = "'%s'" % query
 	urlQuery = 'q=' + replace_chars(query)
-	searchParamenters = urlQuery
+	allowedIngredients = ['chicken']
+	urlIngredients = ''
+	for ing in allowedIngredients:
+		urlIngredients = urlIngredients + '&allowedIngredient[]=%s' % ing
+
+	searchParamenters = urlQuery + urlIngredients
+	#print searchParamenters
 	
 	url = 'http://api.yummly.com/v1/api/recipes?%s&%s' % (yummlyCredentials, searchParamenters)
 	results = process_request(url)
