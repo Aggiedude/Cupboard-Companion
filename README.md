@@ -3,6 +3,8 @@ Welcome to Cupboard Companion!
 
 Cupboard Companion is a service designed to help college students (and other kinds of people who just don't have tons of time and money to devote to cooking) find quick, simple recipes that use up ingredients they already have on hand. We get a list of ingredients from a user and, using the Yummly API, gather recipes that contain those items. Then we process the results based on the number of ingredients, the complexity of the instructions, and some other important factors to determine what recipes are the easiest to prepare. 
 
+User input is currently taken via a text file. Each ingredient should be on its own line in that file, and ingredients can be multiple words (e.g. bell pepper). To run the program, simply input the command "python data_collection.py [input file name].txt"
+
 We use the BeautifulSoup library to pull recipe instructions out of HTML files. To run our program, it is necessary that you have BeautifulSoup installed. Instructions can be found on the following page: 
 https://www.crummy.com/software/BeautifulSoup/bs4/doc/#installing-beautiful-soup
 
