@@ -123,19 +123,21 @@ def main(argv):
 	yummlyCredentials = '%s=%s&%s=%s' % ('_app_id', yummlyAppID, '_app_key', yummlyAppKey)
 
 	queryTextFile = argv[0]
-	f = open(queryTextFile)
-	ingrList = f.read().lower().split()
-
-	#urlQuery = 'q=' + replace_chars(query)
+	
+	allowedIngredients = []
+	with open(queryTextFile) as f:
+		for line in f:
+			line = line.lower()
+			allowedIngredients.append(line)
+			
 	urlQuery = "q=Food+Network"
-	allowedIngredients = ['chicken']
 	urlIngredients = ''
 	for ing in allowedIngredients:
 		urlIngredients = urlIngredients + '&allowedIngredient[]=%s' % ing
 
 	recipeSource = "&allowedSource=Food+Network"
 
-	searchParamenters = urlQuery + urlIngredients + recipeSource
+	searchParamenters = urlQuery + urlIngredients + recipeSource + '&maxResult=20'
 	#print searchParamenters
 	
 	url = 'http://api.yummly.com/v1/api/recipes?%s&%s' % (yummlyCredentials, searchParamenters)
