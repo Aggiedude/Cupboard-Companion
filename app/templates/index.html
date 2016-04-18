@@ -32,7 +32,7 @@
   <div class="row">
   <div class="col-md-4">
       <p class="text-center">What ingredients do you have on hand?</p>
-  <form class="form-horizontal">
+  <form class="form-horizontal" id="ingredient-form">
   <div class="form-group">
     <label for="ingredient1" class="col-sm-4 control-label">Ingredient 1</label>
     <div class="col-sm-8">
@@ -134,8 +134,15 @@
 </div>
 <div class="row">
 <div class="form-group">
-    <div class="col-sm-offset-2 col-sm-10">
+    <div class="col-sm-offset-2 col-sm-10" id="letsCookDiv">
       <button type="submit" class="btn btn-success" style="width: inherit; height: 50px;" id="letsCook">Let's Cook!<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></button>
+    </div>
+  </div>
+</div>
+<div class="row">
+<div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="submit" class="btn btn-danger" style="width: inherit; height: 50px;" id="testRecipe">Test some Recipes!</button>
     </div>
   </div>
 </div>

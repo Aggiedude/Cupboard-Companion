@@ -4,7 +4,6 @@ from textstat.textstat import textstat
 from flask import Flask, render_template, request, json
 
 scored_recipes = []
-allowedIngredients = []
 mainIngredientRecipes = []
 commonCupboard = ['salt','egg','eggs','butter','oil','sugar','granulated sugar','pepper','garlic','milk','all-purpose flour','flour','water']
 
@@ -16,12 +15,12 @@ def main():
 
 @app.route("/recipe-list", methods=['POST'])
 def recipeList():
-	ingredient1 = request.form['ingredient1']
-	ingredient2 = request.form['ingredient2']
-	ingredient3 = request.form['ingredient3']
-	ingredient4 = request.form['ingredient4']
+	ingredient1 = request.form['ingredient1'].encode('ascii','ignore')
+	ingredient2 = request.form['ingredient2'].encode('ascii','ignore')
+	ingredient3 = request.form['ingredient3'].encode('ascii','ignore')
+	ingredient4 = request.form['ingredient4'].encode('ascii','ignore')
 
-	allowedIngredients=[]
+	allowedIngredients = []
 	allowedIngredients.append(ingredient1)
 	allowedIngredients.append(ingredient2)
 	allowedIngredients.append(ingredient3)
@@ -31,9 +30,9 @@ def recipeList():
 
 	return render_template('recipe-list.html')
 
-@app.route("/recipe-list/view/<test>")
-def viewRecipeList(test):
-	return render_template('recipe-list.html', test)
+@app.route("/recipe-list/view")
+def viewRecipeList():
+	return render_template('recipe-list.html')
 
 # replaces common characters in URL queries with appropriately formatted characters
 def replace_chars(query):
@@ -98,7 +97,7 @@ def get_directions(url):
 
 # main algorithm for project
 # Extracts all necessary data from the yummly api, and calls the simplicity algorithm
-def evaluate_recipe(recipe):
+def evaluate_recipe(allowedIngredients, recipe):
 	recipeName = recipe['name'].encode('ascii','ignore')
 	print "evaluating %s" % recipeName
 	
@@ -165,15 +164,20 @@ def begin_recipe_searching(allowedIngredients, disallowedIngredients, cuisineTyp
 			
 	urlQuery = "q=Food+Network"
 	urlIngredients = ''
+	print allowedIngredients
 	for ing in allowedIngredients:
-		urlIngredients = urlIngredients + '&allowedIngredient[]=%s' % ing.strip()
+		if ing:
+			print "the ingredient is " + ing
+			print ing.strip()
+			urlIngredients = urlIngredients + '&allowedIngredient[]=%s' % ing.strip()
 
 	recipeSource = "&allowedSource=Food+Network"
 
-	searchParamenters = urlQuery + urlIngredients + recipeSource + '&maxResult=20'
+	searchParamenters = urlQuery + urlIngredients + recipeSource + '&maxResult=5'
 	#print searchParamenters
 	
 	url = 'http://api.yummly.com/v1/api/recipes?%s&%s' % (yummlyCredentials, searchParamenters)
+	print url
 	results = process_request(url)
 	
 	completeRecipes = []
@@ -185,7 +189,7 @@ def begin_recipe_searching(allowedIngredients, disallowedIngredients, cuisineTyp
 		
 	# evaluate the simplicity for every recipe gathered
 	for item in completeRecipes:
-		evaluate_recipe(item)
+		evaluate_recipe(allowedIngredients, item)
 	
 	scored_recipes.sort(key=lambda number: number[-1])
 

@@ -14,18 +14,52 @@ $(function(){
 	   '</div>';
 		$(over).appendTo('body');
 	}
-    // $('#letsCook').click(function(){
-    //     $.ajax({
-    //         url: '/recipe-list',
-    //         data: $('form').serialize(),
-    //         type: 'POST',
-    //         success: function(response){
-    //             console.log(response);
-    //         },
-    //         error: function(error){
-    //             console.log(error);
-    //         }
-    //     });
-    // });
-    $('#letsCook').click(loading);
+
+    $('#letsCook').click(function(){
+        var ingredients = [$('#ingredient1').val(),$('#ingredient2').val(),$('#ingredient3').val(),$('#ingredient4').val()];
+        var has_ingredients = false;
+        for (var i = 0; i < ingredients.length; i++) {
+            if(ingredients[i]){
+                has_ingredients = true;
+                break;
+            }
+        };
+
+        if(has_ingredients){
+            $('#letsCookDiv').remove("#error-message")
+            $('#ingredient-form').removeClass('has-error');
+            $.ajax({
+                url: '/recipe-list',
+                data: $('form').serialize(),
+                type: 'POST',
+                success: function(response){
+                    console.log(response);
+                    window.location = '/recipe-list/view';
+                },
+                error: function(error){
+                    console.log(error);
+                }
+            });
+            loading();
+        }
+        else {
+            $('#letsCookDiv').append('<div class="text-center" id="error-message">Sorry, you need to add at least one ingredient, silly!</div>')
+            $('#ingredient-form').addClass('has-error');
+        }
+    });
+
+    $('#testRecipe').click(function(){
+        $.ajax({
+            url: '/recipe-list/view',
+            data: 'testing',
+            type: 'GET',
+            success: function(data, response){
+                console.log(response);
+                window.location = '/recipe-list/view';
+            },
+            error: function(error){
+                console.log(error);
+            }
+        });
+    });
 });
