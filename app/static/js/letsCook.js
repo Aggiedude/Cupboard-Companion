@@ -49,17 +49,18 @@ $(function(){
     });
 
     $('#testRecipe').click(function(){
-        $.ajax({
-            url: '/recipe-list/view',
-            data: 'testing',
-            type: 'GET',
-            success: function(data, response){
-                console.log(response);
-                window.location = '/recipe-list/view';
-            },
-            error: function(error){
-                console.log(error);
-            }
-        });
+        window.location = '/recipe-list/view';
+        // $.ajax({
+        //     url: '/recipe-list/view',
+        //     data: 'testing',
+        //     type: 'GET',
+        //     success: function(data, response){
+        //         console.log(response);
+        //         window.location = '/recipe-list/view';
+        //     },
+        //     error: function(error){
+        //         console.log(error);
+        //     }
+        // });
     });
 });

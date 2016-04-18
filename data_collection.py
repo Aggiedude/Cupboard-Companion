@@ -2,10 +2,46 @@ import urllib2, json, string, base64, re, sys
 from bs4 import BeautifulSoup
 from textstat.textstat import textstat
 
-scored_recipes = []
 allowedIngredients = []
 mainIngredientRecipes = []
+recipeList = []
 commonCupboard = ['salt','egg','eggs','butter','oil','sugar','granulated sugar','pepper','garlic','milk','all-purpose flour','flour','water']
+
+class Recipe:
+
+	def __init__(self, name):
+		self.name = name
+		self.ingredients = []
+		self.directions = ''
+		self.prepTime = 0
+		self.cookTime = 0
+		self.haveAllIngredients = False
+		self.score = 0
+		self.imageURL = ''
+
+	def __str__(self):
+		return self.name+'\n'+str(self.ingredients)+'\n'+str(self.score)
+
+	def addIngredient(self, ing):
+		self.ingredients.extend(ing)
+
+	def addDirections(self, direct):
+		self.directions = direct
+
+	def addPrepTime(self, time):
+		self.prepTime = time
+
+	def addCookTime(self, time):
+		self.cookTime = time
+
+	def hasAllIngredients(self, boolean):
+		self.haveAllIngredients = boolean
+
+	def addScore(self, score):
+		self.score = score
+
+	def addImage(self, url):
+		self.imageURL = url
 
 # replaces common characters in URL queries with appropriately formatted characters
 def replace_chars(query):
@@ -104,8 +140,17 @@ def evaluate_recipe(recipe):
 	flavors = recipe['flavors']
 
 	if directionsText:
+		rec = Recipe(recipeName)
+		rec.addIngredient(mainIngredientRecipes[mainIngredientRecipes.index(recipe['id'])+1])		
+		rec.addDirections(directionsText)
+		rec.addPrepTime(prepTime)
+		rec.addCookTime(cookTime)
+		rec.hasAllIngredients(numMissingIngr == 0)
+
 		simplicityScore = evaluate_simplicity(numTotalIngredients,prepTime,cookTime,numMissingIngr,directionsText)
-		scored_recipes.append((recipeName,simplicityScore))
+		rec.addScore(simplicityScore)
+
+		recipeList.append(rec)
 
 # Assigns a score to a recipe based upon a number of factors 
 def evaluate_simplicity(numIng, prepTime, cookTime, numMissingIngr, directionsText):
@@ -125,8 +170,8 @@ def evaluate_simplicity(numIng, prepTime, cookTime, numMissingIngr, directionsTe
 def printResults(ingList):
 	print 'The simplest recipes for the ingredients ' + str(ingList) + ' are the following:'
 	i = 0
-	while i < len(scored_recipes):
-		print str(i+1) + '. ' + str(scored_recipes[i])
+	while i < len(recipeList):
+		print str(i+1) + '. ' + str(recipeList[i].name) + ' - ' + str(recipeList[i].score) 
 		i += 1
 	
 def main(argv):
@@ -145,11 +190,12 @@ def main(argv):
 	urlQuery = "q=Food+Network"
 	urlIngredients = ''
 	for ing in allowedIngredients:
-		urlIngredients = urlIngredients + '&allowedIngredient[]=%s' % ing.strip()
+		if ing:
+			urlIngredients = urlIngredients + '&allowedIngredient[]=%s' % ing.strip()
 
 	recipeSource = "&allowedSource=Food+Network"
 
-	searchParamenters = urlQuery + urlIngredients + recipeSource + '&maxResult=20'
+	searchParamenters = urlQuery + urlIngredients + recipeSource + '&maxResult=5'
 	#print searchParamenters
 	
 	url = 'http://api.yummly.com/v1/api/recipes?%s&%s' % (yummlyCredentials, searchParamenters)
@@ -166,7 +212,7 @@ def main(argv):
 	for item in completeRecipes:
 		evaluate_recipe(item)
 	
-	scored_recipes.sort(key=lambda number: number[-1])
+	recipeList.sort(key= lambda x: x.score)
 
 	printResults(allowedIngredients)
 	

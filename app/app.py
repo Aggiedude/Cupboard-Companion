@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 from textstat.textstat import textstat
 from flask import Flask, render_template, request, json
 
-scored_recipes = []
+recipeList = []
 mainIngredientRecipes = []
 commonCupboard = ['salt','egg','eggs','butter','oil','sugar','granulated sugar','pepper','garlic','milk','all-purpose flour','flour','water']
 
@@ -32,7 +32,44 @@ def recipeList():
 
 @app.route("/recipe-list/view")
 def viewRecipeList():
-	return render_template('recipe-list.html')
+	tempList = ["element1", "element2", "element3", "element4", "element5", "element6", "element7"]
+	return render_template('recipe-list.html', tempList = tempList)
+
+class Recipe:
+
+	def __init__(self, name):
+		self.name = name
+		self.ingredients = []
+		self.directions = ''
+		self.prepTime = 0
+		self.cookTime = 0
+		self.haveAllIngredients = False
+		self.score = 0
+		self.imageURL = ''
+
+	def __str__(self):
+		return self.name+'\n'+str(self.ingredients)+'\n'+str(self.score)
+
+	def addIngredient(self, ing):
+		self.ingredients.extend(ing)
+
+	def addDirections(self, direct):
+		self.directions = direct
+
+	def addPrepTime(self, time):
+		self.prepTime = time
+
+	def addCookTime(self, time):
+		self.cookTime = time
+
+	def hasAllIngredients(self, boolean):
+		self.haveAllIngredients = boolean
+
+	def addScore(self, score):
+		self.score = score
+
+	def addImage(self, url):
+		self.imageURL = url
 
 # replaces common characters in URL queries with appropriately formatted characters
 def replace_chars(query):
@@ -131,8 +168,17 @@ def evaluate_recipe(allowedIngredients, recipe):
 	flavors = recipe['flavors']
 
 	if directionsText:
+		rec = Recipe(recipeName)
+		rec.addIngredient(mainIngredientRecipes[mainIngredientRecipes.index(recipe['id'])+1])		
+		rec.addDirections(directionsText)
+		rec.addPrepTime(prepTime)
+		rec.addCookTime(cookTime)
+		rec.hasAllIngredients(numMissingIngr == 0)
+
 		simplicityScore = evaluate_simplicity(numTotalIngredients,prepTime,cookTime,numMissingIngr,directionsText)
-		scored_recipes.append((recipeName,simplicityScore))
+		rec.addScore(simplicityScore)
+
+		recipeList.append(rec)
 
 # Assigns a score to a recipe based upon a number of factors 
 def evaluate_simplicity(numIng, prepTime, cookTime, numMissingIngr, directionsText):
@@ -152,8 +198,8 @@ def evaluate_simplicity(numIng, prepTime, cookTime, numMissingIngr, directionsTe
 def printResults(ingList):
 	print 'The simplest recipes for the ingredients ' + str(ingList) + ' are the following:'
 	i = 0
-	while i < len(scored_recipes):
-		print str(i+1) + '. ' + str(scored_recipes[i])
+	while i < len(recipeList):
+		print str(i+1) + '. ' + str(recipeList[i].name) + ' - ' + str(recipeList[i].score) 
 		i += 1
 	
 def begin_recipe_searching(allowedIngredients, disallowedIngredients, cuisineType):
@@ -164,11 +210,8 @@ def begin_recipe_searching(allowedIngredients, disallowedIngredients, cuisineTyp
 			
 	urlQuery = "q=Food+Network"
 	urlIngredients = ''
-	print allowedIngredients
 	for ing in allowedIngredients:
 		if ing:
-			print "the ingredient is " + ing
-			print ing.strip()
 			urlIngredients = urlIngredients + '&allowedIngredient[]=%s' % ing.strip()
 
 	recipeSource = "&allowedSource=Food+Network"
@@ -177,7 +220,6 @@ def begin_recipe_searching(allowedIngredients, disallowedIngredients, cuisineTyp
 	#print searchParamenters
 	
 	url = 'http://api.yummly.com/v1/api/recipes?%s&%s' % (yummlyCredentials, searchParamenters)
-	print url
 	results = process_request(url)
 	
 	completeRecipes = []
@@ -191,7 +233,7 @@ def begin_recipe_searching(allowedIngredients, disallowedIngredients, cuisineTyp
 	for item in completeRecipes:
 		evaluate_recipe(allowedIngredients, item)
 	
-	scored_recipes.sort(key=lambda number: number[-1])
+	recipeList.sort(key= lambda x: x.score)
 
 	printResults(allowedIngredients)
 	
