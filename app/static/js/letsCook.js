@@ -1,21 +1,31 @@
 $(function(){
 	var loading = function(){
-		var over = '<div id="overlay">' +
-			'<img id="loading" src="../static/css/loading.css">' +
-			'</div>';
+		var over = '<div id="overlay">'+
+        '<div id="fountainG">'+
+            '<div id="fountainG_1" class="fountainG"></div>'+
+            '<div id="fountainG_2" class="fountainG"></div>'+
+            '<div id="fountainG_3" class="fountainG"></div>'+
+            '<div id="fountainG_4" class="fountainG"></div>'+
+            '<div id="fountainG_5" class="fountainG"></div>'+
+            '<div id="fountainG_6" class="fountainG"></div>'+
+            '<div id="fountainG_7" class="fountainG"></div>'+
+            '<div id="fountainG_8" class="fountainG"></div>'+
+        '</div>' +
+	   '</div>';
 		$(over).appendTo('body');
 	}
-    $('#letsCook').click(function(){
-        $.ajax({
-            url: '/recipe-list',
-            data: $('form').serialize(),
-            type: 'POST',
-            success: function(response){
-                console.log(response);
-            },
-            error: function(error){
-                console.log(error);
-            }
-        });
-    });
+    // $('#letsCook').click(function(){
+    //     $.ajax({
+    //         url: '/recipe-list',
+    //         data: $('form').serialize(),
+    //         type: 'POST',
+    //         success: function(response){
+    //             console.log(response);
+    //         },
+    //         error: function(error){
+    //             console.log(error);
+    //         }
+    //     });
+    // });
+    $('#letsCook').click(loading);
 });

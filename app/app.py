@@ -31,9 +31,9 @@ def recipeList():
 
 	return render_template('recipe-list.html')
 
-@app.route("/recipe-list/view")
-def viewRecipeList():
-	return render_template('recipe-list.html')
+@app.route("/recipe-list/view/<test>")
+def viewRecipeList(test):
+	return render_template('recipe-list.html', test)
 
 # replaces common characters in URL queries with appropriately formatted characters
 def replace_chars(query):
