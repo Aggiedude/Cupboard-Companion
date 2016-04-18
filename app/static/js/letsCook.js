@@ -1,4 +1,10 @@
 $(function(){
+	var loading = function(){
+		var over = '<div id="overlay">' +
+			'<img id="loading" src="../static/css/loading.css">' +
+			'</div>';
+		$(over).appendTo('body');
+	}
     $('#letsCook').click(function(){
         $.ajax({
             url: '/recipe-list',
