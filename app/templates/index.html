@@ -27,6 +27,7 @@
 	<h1>Welcome to Cupboard Companion!</h1>
 </div>
 <div class="fluid-container">
+  <div class="row">
   <div class="col-md-4">
       <p class="text-center">What ingredients do you have on hand?</p>
   <form class="form-horizontal">
@@ -56,18 +57,14 @@
   </div>
   <div class="form-group">
     <span class="col-sm-4"></span>
-    <button type="button" class=" btn btn-default"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Another Ingredient</button>
-  </div>
-  <div class="form-group">
-    <div class="col-sm-offset-2 col-sm-8">
-      <button type="submit" class="btn btn-default" id="letsCook">Let's Cook!</button>
-    </div>
+    <button type="button" style="margin-left: 15px" class=" btn btn-default"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Another Ingredient</button>
   </div>
 </form>
   </div>
-  <div class="col-md-4">
+  <div class="col-md-3">
 	<p class="text-center">What meal types are you interested in? Check all that apply.</p>
-	 <div class="checkbox">
+	 <div class="col-sm-offset-2" id="cuisineTypes">
+   <div class="checkbox">
 	  <label>
 		<input type="checkbox" value="">
 		Breakfast 
@@ -98,6 +95,7 @@
 	  </label>
 	</div>
   </div>
+</div>
   <div class="col-md-4">
       <p class="text-center">Any ingredients you absolutely don't want included?</p>
   <form class="form-horizontal">
@@ -127,9 +125,17 @@
   </div>
   <div class="form-group">
     <span class="col-sm-4"></span>
-    <button type="button" class=" btn btn-default"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Another Ingredient</button>
+    <button type="button" style="margin-left: 15px" class=" btn btn-default"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Another Ingredient</button>
   </div>
 </form>
   </div>
+</div>
+<div class="row">
+<div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="submit" class="btn btn-success" style="width: inherit; height: 50px;" id="letsCook">Let's Cook!<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></button>
+    </div>
+  </div>
+</div>
 </div>
 </html>
