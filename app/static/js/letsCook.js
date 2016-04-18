@@ -1,6 +1,5 @@
 $(function(){
     $('#letsCook').click(function(){
-        
         $.ajax({
             url: '/recipe-list',
             data: $('form').serialize(),

@@ -29,7 +29,11 @@ def recipeList():
 
 	begin_recipe_searching(allowedIngredients, [], [])
 
-	return json.dumps({'html':ingredient1})
+	return render_template('recipe-list.html')
+
+@app.route("/recipe-list/view")
+def viewRecipeList():
+	return render_template('recipe-list.html')
 
 # replaces common characters in URL queries with appropriately formatted characters
 def replace_chars(query):
