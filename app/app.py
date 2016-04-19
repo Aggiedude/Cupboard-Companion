@@ -9,32 +9,6 @@ commonCupboard = ['salt','egg','eggs','butter','oil','sugar','granulated sugar',
 
 app = Flask(__name__)
 
-@app.route("/")
-def main():
-	return render_template('index.html')
-
-@app.route("/recipe-list", methods=['POST'])
-def recipeList():
-	ingredient1 = request.form['ingredient1'].encode('ascii','ignore')
-	ingredient2 = request.form['ingredient2'].encode('ascii','ignore')
-	ingredient3 = request.form['ingredient3'].encode('ascii','ignore')
-	ingredient4 = request.form['ingredient4'].encode('ascii','ignore')
-
-	allowedIngredients = []
-	allowedIngredients.append(ingredient1)
-	allowedIngredients.append(ingredient2)
-	allowedIngredients.append(ingredient3)
-	allowedIngredients.append(ingredient4)
-
-	begin_recipe_searching(allowedIngredients, [], [])
-
-	return render_template('recipe-list.html')
-
-@app.route("/recipe-list/view")
-def viewRecipeList():
-	tempList = ["element1", "element2", "element3", "element4", "element5", "element6", "element7"]
-	return render_template('recipe-list.html', tempList = tempList)
-
 class Recipe:
 
 	def __init__(self, name):
@@ -70,6 +44,65 @@ class Recipe:
 
 	def addImage(self, url):
 		self.imageURL = url
+
+@app.route("/")
+def main():
+	return render_template('index.html')
+
+@app.route("/recipe-list", methods=['POST'])
+def recipeList():
+	ingredient1 = request.form['ingredient1'].encode('ascii','ignore')
+	ingredient2 = request.form['ingredient2'].encode('ascii','ignore')
+	ingredient3 = request.form['ingredient3'].encode('ascii','ignore')
+	ingredient4 = request.form['ingredient4'].encode('ascii','ignore')
+
+	allowedIngredients = []
+	allowedIngredients.append(ingredient1)
+	allowedIngredients.append(ingredient2)
+	allowedIngredients.append(ingredient3)
+	allowedIngredients.append(ingredient4)
+
+	begin_recipe_searching(allowedIngredients, [], [])
+
+	return render_template('recipe-list.html')
+
+@app.route("/recipe-list/view")
+def viewRecipeList():
+	tempList1 = ["element1", "element2", "element3", "element4", "element5", "element6", "element7"]
+	tempList = []
+
+	rec1 = Recipe('Recipe 1')
+	rec1.addIngredient(['cheese', 'eggs'])
+	rec1.addScore(12)
+	rec1.addDirections("Place this in the oven")
+	rec1.addImage('http://foodnetwork.sndimg.com/content/dam/images/food/fullset/2003/10/16/3/tm1b51_grilled_cheese.jpg.rend.sni12col.landscape.jpeg')
+
+	rec2 = Recipe('Recipe 2')
+	rec2.addIngredient(['cheese','eggs', 'milk'])
+	rec2.addScore(50)
+	rec2.addDirections("Place this in the mirowave")
+	rec2.addImage('http://foodnetwork.sndimg.com/content/dam/images/food/fullset/2010/3/25/0/FNM_050110-Cover-002_s4x3.jpg.rend.sni12col.landscape.jpeg')
+
+	rec3 = Recipe('Recipe 3')
+	rec3.addIngredient(['bread'])
+	rec3.addScore(6)
+	rec3.addDirections("Place this in the stove")
+	rec3.addImage('http://foodnetwork.sndimg.com/content/dam/images/food/fullset/2008/7/2/0/PB0108_Chicken-Salad-Sliders.jpg.rend.sni12col.landscape.jpeg')
+
+	rec4 = Recipe('Recipe 4')
+	rec4.addIngredient(['cheese','eggs', 'bread', 'onion'])
+	rec4.addScore(78)
+	rec4.addDirections("Place this in the fridge")
+	rec4.addImage('http://foodnetwork.sndimg.com/content/dam/images/food/fullset/2007/3/8/0/tu0211_sandwich.jpg.rend.sni12col.landscape.jpeg')
+
+	tempList.append(rec1)
+	tempList.append(rec2)
+	tempList.append(rec3)
+	tempList.append(rec4)
+
+	tempList.sort(key= lambda x: x.score)
+
+	return render_template('recipe-list.html', tempList = tempList)
 
 # replaces common characters in URL queries with appropriately formatted characters
 def replace_chars(query):
