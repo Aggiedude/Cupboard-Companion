@@ -36,15 +36,23 @@
       {% for recipe in group_of_3 %}
         <div class="col-md-3">
           <div class="card">
-            <img class="card-img-top" style="margin: auto; display: block;" src={{recipe.imageURL}} alt="Card image cap">
+            <img class="card-img-top" style="width: 100%; padding: 15px;" src={{recipe.imageURL}} alt="Card image cap">
             <div class="card-block">
-              <h4 class="card-title">{{recipe.name}}</h4>
-              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-              <a href="#" style="display: table; margin: auto;" class="btn btn-primary">Looks Delicious!</a>
+              <h4 class="card-title" style="text-align: center;">{{recipe.name}}</h4>
+              <h6 class="card-subtitle text-muted" style="text-align: center;">Cook Time: {{recipe.cookTime}} </h6>
+              <hr>
+              <h4 class="card-title">Ingredients</h4>
+              <ul class="list-group">
+                {% for ingredient in recipe.ingredients %}
+                  <li class="list-group-item">{{ingredient}}</li>
+                {% endfor %}
+              </ul>
+              <a href="/recipe/{{loop.index0}}" id="recipe{{loop.index}}" style="display: table; margin: auto;" class="btn btn-primary">Looks Delicious!</a>
             </div>
           </div>
         </div>
-  {% endfor %}
+      {% endfor %}
   </div>
+  <hr>
 {% endfor %}
 </div>

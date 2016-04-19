@@ -1,10 +1,11 @@
 import urllib2, json, string, base64, re, sys
 from bs4 import BeautifulSoup
 from textstat.textstat import textstat
-from flask import Flask, render_template, request, json
+from flask import Flask, render_template, request, json, url_for
 
 recipeList = []
 mainIngredientRecipes = []
+tempList = []
 commonCupboard = ['salt','egg','eggs','butter','oil','sugar','granulated sugar','pepper','garlic','milk','all-purpose flour','flour','water']
 
 app = Flask(__name__)
@@ -68,31 +69,33 @@ def recipeList():
 
 @app.route("/recipe-list/view")
 def viewRecipeList():
-	tempList1 = ["element1", "element2", "element3", "element4", "element5", "element6", "element7"]
-	tempList = []
 
 	rec1 = Recipe('Recipe 1')
 	rec1.addIngredient(['cheese', 'eggs'])
 	rec1.addScore(12)
 	rec1.addDirections("Place this in the oven")
+	rec1.addCookTime(3300)
 	rec1.addImage('http://foodnetwork.sndimg.com/content/dam/images/food/fullset/2003/10/16/3/tm1b51_grilled_cheese.jpg.rend.sni12col.landscape.jpeg')
 
 	rec2 = Recipe('Recipe 2')
 	rec2.addIngredient(['cheese','eggs', 'milk'])
 	rec2.addScore(50)
 	rec2.addDirections("Place this in the mirowave")
+	rec2.addCookTime(5650)
 	rec2.addImage('http://foodnetwork.sndimg.com/content/dam/images/food/fullset/2010/3/25/0/FNM_050110-Cover-002_s4x3.jpg.rend.sni12col.landscape.jpeg')
 
 	rec3 = Recipe('Recipe 3')
 	rec3.addIngredient(['bread'])
 	rec3.addScore(6)
 	rec3.addDirections("Place this in the stove")
+	rec3.addCookTime(6000)
 	rec3.addImage('http://foodnetwork.sndimg.com/content/dam/images/food/fullset/2008/7/2/0/PB0108_Chicken-Salad-Sliders.jpg.rend.sni12col.landscape.jpeg')
 
 	rec4 = Recipe('Recipe 4')
 	rec4.addIngredient(['cheese','eggs', 'bread', 'onion'])
 	rec4.addScore(78)
 	rec4.addDirections("Place this in the fridge")
+	rec4.addCookTime(2800)
 	rec4.addImage('http://foodnetwork.sndimg.com/content/dam/images/food/fullset/2007/3/8/0/tu0211_sandwich.jpg.rend.sni12col.landscape.jpeg')
 
 	tempList.append(rec1)
@@ -103,6 +106,11 @@ def viewRecipeList():
 	tempList.sort(key= lambda x: x.score)
 
 	return render_template('recipe-list.html', tempList = tempList)
+
+@app.route('/recipe/<rec>')
+def viewRecipe(rec):
+	print "got here"
+	return render_template('recipe.html')
 
 # replaces common characters in URL queries with appropriately formatted characters
 def replace_chars(query):
