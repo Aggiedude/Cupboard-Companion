@@ -39,3 +39,7 @@
 	max-height: 180px;
 	margin: auto;
 }
+
+.border-left {
+    border-left: 1px solid black;
+}
