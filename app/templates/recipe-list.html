@@ -17,7 +17,7 @@
   	</div>
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li><a href="about-us.html">About Us</a></li>
+        <li><a href="../about-us">About Us</a></li>
       </ul>
     </div>
   </div>
@@ -25,9 +25,6 @@
 {% set count = [] %}
 <div class="page-header text-center">
   <h1>Here be your simple recipes!</h1>
-  {% for item in tempList%}
-    <p>The {{loop.index}} item is this: {{item}}</p>
-  {% endfor %}
 </div>
 <div class="fluid-container">
 {% for group_of_3 in tempList|batch(3) %}

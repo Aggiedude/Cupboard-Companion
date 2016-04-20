@@ -66,6 +66,7 @@
 
 #notForMe {
     background-color: #c9302c;
+    margin-right: 50px;
 }
 
 #notForMe:hover {
