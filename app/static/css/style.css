@@ -33,3 +33,9 @@
 	text-align: center;
     position: absolute;
 }
+
+.image-container {
+	max-width: 200px;
+	max-height: 180px;
+	margin: auto;
+}

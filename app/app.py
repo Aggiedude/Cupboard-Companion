@@ -50,6 +50,10 @@ class Recipe:
 def main():
 	return render_template('index.html')
 
+@app.route("/about-us")
+def aboutUs():
+	return render_template('about-us.html')
+	
 @app.route("/recipe-list", methods=['POST'])
 def recipeList():
 	ingredient1 = request.form['ingredient1'].encode('ascii','ignore')
