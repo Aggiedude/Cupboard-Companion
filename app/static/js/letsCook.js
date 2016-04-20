@@ -10,9 +10,17 @@ $(function(){
             '<div id="fountainG_6" class="fountainG"></div>'+
             '<div id="fountainG_7" class="fountainG"></div>'+
             '<div id="fountainG_8" class="fountainG"></div>'+
+			'<br><div id="loadingMessage">' +
+				'<div id="lmOne">Going to the store...</div>' +
+				'<div id="lmTwo">Calling Mom...</div>' +
+			'</div>' +
         '</div>' +
 	   '</div>';
+	   
 		$(over).appendTo('body');
+		$('#lmTwo').hide();
+		$('#lmOne').delay(1500).fadeOut(800);
+		$('#lmTwo').delay(3000).fadeIn(800);
 	}
 
     $('#letsCook').click(function(){
