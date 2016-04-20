@@ -9,15 +9,18 @@ tempList = []
 commonCupboard = ['salt','egg','eggs','butter','oil','sugar','granulated sugar','pepper','garlic','milk','all-purpose flour','flour','water']
 
 app = Flask(__name__)
+app.jinja_env.add_extension('jinja2.ext.do')
 
 class Recipe:
 
 	def __init__(self, name):
 		self.name = name
 		self.ingredients = []
+		self.measuredIngredients = []
 		self.directions = ''
-		self.prepTime = 0
-		self.cookTime = 0
+		self.prepTime = ''
+		self.cookTime = ''
+		self.totalTime = ''
 		self.haveAllIngredients = False
 		self.score = 0
 		self.imageURL = ''
@@ -28,8 +31,14 @@ class Recipe:
 	def addIngredient(self, ing):
 		self.ingredients.extend(ing)
 
+	def addMeasuredIngredient(self, measuredIng):
+		self.measuredIngredients.extend(measuredIng)
+
 	def addDirections(self, direct):
 		self.directions = direct
+
+	def addTotalTime(self, time):
+		self.totalTime = time
 
 	def addPrepTime(self, time):
 		self.prepTime = time
@@ -76,30 +85,40 @@ def viewRecipeList():
 
 	rec1 = Recipe('Recipe 1')
 	rec1.addIngredient(['cheese', 'eggs'])
+	rec1.addMeasuredIngredient(['2/3 cup cheese', ' 3 eggs'])
 	rec1.addScore(12)
 	rec1.addDirections("Place this in the oven")
-	rec1.addCookTime(3300)
+	rec1.addPrepTime('1 hr')
+	rec1.addTotalTime('1 hr')
 	rec1.addImage('http://foodnetwork.sndimg.com/content/dam/images/food/fullset/2003/10/16/3/tm1b51_grilled_cheese.jpg.rend.sni12col.landscape.jpeg')
 
 	rec2 = Recipe('Recipe 2')
 	rec2.addIngredient(['cheese','eggs', 'milk'])
+	rec2.addMeasuredIngredient(['1/2 cup cheese','2 eggs', '1 cup milk'])
 	rec2.addScore(50)
 	rec2.addDirections("Place this in the mirowave")
-	rec2.addCookTime(5650)
+	rec2.addCookTime('50 min')
+	rec2.addPrepTime('20 min')
+	rec2.addTotalTime('1 hr 10 min')
 	rec2.addImage('http://foodnetwork.sndimg.com/content/dam/images/food/fullset/2010/3/25/0/FNM_050110-Cover-002_s4x3.jpg.rend.sni12col.landscape.jpeg')
 
 	rec3 = Recipe('Recipe 3')
 	rec3.addIngredient(['bread'])
+	rec3.addMeasuredIngredient(['3 loaves bread'])
 	rec3.addScore(6)
 	rec3.addDirections("Place this in the stove")
-	rec3.addCookTime(6000)
+	rec3.addCookTime('1 hr 10 min')
+	rec3.addTotalTime('1 hr 10 min')
 	rec3.addImage('http://foodnetwork.sndimg.com/content/dam/images/food/fullset/2008/7/2/0/PB0108_Chicken-Salad-Sliders.jpg.rend.sni12col.landscape.jpeg')
 
 	rec4 = Recipe('Recipe 4')
 	rec4.addIngredient(['cheese','eggs', 'bread', 'onion'])
+	rec4.addMeasuredIngredient(['1 cup cheese','2 scrambled eggs', '2 slices bread', '1 diced onion'])
 	rec4.addScore(78)
 	rec4.addDirections("Place this in the fridge")
-	rec4.addCookTime(2800)
+	rec4.addCookTime('20 min')
+	rec4.addPrepTime('10 min')
+	rec4.addTotalTime('30 min')
 	rec4.addImage('http://foodnetwork.sndimg.com/content/dam/images/food/fullset/2007/3/8/0/tu0211_sandwich.jpg.rend.sni12col.landscape.jpeg')
 
 	tempList.append(rec1)
@@ -111,10 +130,17 @@ def viewRecipeList():
 
 	return render_template('recipe-list.html', tempList = tempList)
 
-@app.route('/recipe/<rec>')
-def viewRecipe(rec):
+@app.route('/recipe/<recName>')
+def viewRecipe(recName):
 	print "got here"
-	return render_template('recipe.html')
+	recIndex = None
+	i = 0
+	while i < len(tempList):
+		if tempList[i].name == str(recName):
+			recIndex = i
+			break
+		i+=1
+	return render_template('recipe.html', recipe=tempList[recIndex])
 
 # replaces common characters in URL queries with appropriately formatted characters
 def replace_chars(query):
@@ -194,16 +220,22 @@ def evaluate_recipe(allowedIngredients, recipe):
 	else:
 		return
 
+	totalTimeProper = recipe['totalTime']
 	prepTime = 0
+	prepTimeProper = ''
 	if 'prepTimeInSeconds' in recipe:
 		prepTime = recipe['prepTimeInSeconds']
+		prepTimeProper = recipe['prepTime']
 
 	cookTime = 0
+	cookTimeProper = ''
 	if 'cookTimeInSeconds' in recipe:
 		cookTime = recipe['cookTimeInSeconds']
+		cookTimeProper = recipe['cookTime']
 	else:
 		if prepTime == 0: # API returned non-specific cooking time
 			cookTime = recipe['totalTimeInSeconds'] # will use total time as cook time in algorithm instead
+			cookTimeProper = recipe['totalTime']
 
 	ingredientList = recipe['ingredientLines']
 	numTotalIngredients = len(ingredientList)
@@ -214,10 +246,12 @@ def evaluate_recipe(allowedIngredients, recipe):
 
 	if directionsText:
 		rec = Recipe(recipeName)
-		rec.addIngredient(mainIngredientRecipes[mainIngredientRecipes.index(recipe['id'])+1])		
+		rec.addIngredient(mainIngredientRecipes[mainIngredientRecipes.index(recipe['id'])+1])
+		rec.addMeasuredIngredient(ingredientList)		
 		rec.addDirections(directionsText)
-		rec.addPrepTime(prepTime)
-		rec.addCookTime(cookTime)
+		rec.addPrepTime(prepTimeProper)
+		rec.addCookTime(cookTimeProper)
+		rec.addTotalTime(totalTimeProper)
 		rec.hasAllIngredients(numMissingIngr == 0)
 
 		simplicityScore = evaluate_simplicity(numTotalIngredients,prepTime,cookTime,numMissingIngr,directionsText)

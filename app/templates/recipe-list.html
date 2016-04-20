@@ -22,7 +22,7 @@
     </div>
   </div>
 </nav>
-
+{% set count = [] %}
 <div class="page-header text-center">
   <h1>Here be your simple recipes!</h1>
   {% for item in tempList%}
@@ -31,15 +31,15 @@
 </div>
 <div class="fluid-container">
 {% for group_of_3 in tempList|batch(3) %}
-  <div class="row">
+  <div class="row card-same-height">
     <div class="col-md-1"></div>
       {% for recipe in group_of_3 %}
-        <div class="col-md-3">
-          <div class="card">
-            <img class="card-img-top" style="width: 100%; padding: 15px;" src={{recipe.imageURL}} alt="Card image cap">
+        <div class="col-md-3 card-same-height">
+          <div class="card" id="recipe{{count|length}}-card">
+            <img class="card-img-top" style="width: 100%; padding: 15px;" src={{recipe.imageURL}} alt={{recipe.name}}>
             <div class="card-block">
               <h4 class="card-title" style="text-align: center;">{{recipe.name}}</h4>
-              <h6 class="card-subtitle text-muted" style="text-align: center;">Cook Time: {{recipe.cookTime}} </h6>
+              <h6 class="card-subtitle text-muted" style="text-align: center;">Total Time: {{recipe.totalTime}} </h6>
               <hr>
               <h4 class="card-title">Ingredients</h4>
               <ul class="list-group">
@@ -47,12 +47,28 @@
                   <li class="list-group-item">{{ingredient}}</li>
                 {% endfor %}
               </ul>
-              <a href="/recipe/{{loop.index0}}" id="recipe{{loop.index}}" style="display: table; margin: auto;" class="btn btn-primary">Looks Delicious!</a>
             </div>
+            <a href="/recipe/{{recipe.name}}" id="recipe{{count|length}}-button" class="btn btn-primary card-button">Looks Delicious!</a>
           </div>
         </div>
+        {% do count.append(1) %}
       {% endfor %}
   </div>
   <hr>
 {% endfor %}
+<script>
+            $(function(){
+              var numRecipes = $('.card-button').size();
+
+              for(i = 0; i < numRecipes;i++) {
+                var $but = $('#recipe'+i+'-button');
+                var $card = $('#recipe'+i+'-card')
+                var bottom_button = $but.position().top + $but.outerHeight(true);
+                var bottom_card = $card.position().top + $card.outerHeight(true);
+
+                var difference = bottom_card - bottom_button - 29.25;
+                $but.css("margin-top",""+difference);
+              }
+            });
+            </script>
 </div>

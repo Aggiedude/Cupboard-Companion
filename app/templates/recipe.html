@@ -24,5 +24,61 @@
 </nav>
 
 <div class="page-header text-center">
-  <h1>Here be a recipe!</h1>
+  <h1>Here be {{recipe.name}}</h1>
+</div>
+<div class="fluid-container">
+  <div class="row">
+    <div class="col-md-offset-1 col-md-4">
+      <img class='img-thumbnail img-responsive' src={{recipe.imageURL}} alt="Card image cap">
+    </div>
+    <div class="col-md-offset-2 col-md-3">
+      <div class="card" style="margin-bottom: 50px;">
+        <h3 class="card-header text-center recipe-time-header" style="margin-top: 0px;">Preperation Time</h3>
+        <div class="card-block">
+          <h3 class="card-title text-center" style="margin-top: 0px;">
+            {% if recipe.prepTime %}
+              {{recipe.prepTime}}
+            {% else %}
+              0 min
+            {% endif %}
+          </h3>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="card-header text-center recipe-time-header" style="margin-top: 0px;">Cook Time</h3>
+        <div class="card-block">
+          <h3 class="card-title text-center" style="margin-top: 0px;">
+            {% if recipe.cookTime %}
+              {{recipe.cookTime}}
+            {% else %}
+              0 min
+            {% endif %}
+          </h3>
+        </div>
+      </div>
+    </div>
+  </div>
+  <hr>
+  <div class="row">
+    <div class="col-md-offset-2 col-md-3">
+      <h2><u>Ingredients</u></h2>
+      <ul>
+        {% for ingredient in recipe.measuredIngredients %}
+        <li><h4>{{ingredient}}</h4></li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="col-md-offset-1 col-md-4">
+      <h2><u>Directions</u></h2>
+      <h4>
+        {{recipe.directions}}
+      </h4>
+    </div>
+  </div>
+  <div class="row">
+    <div class="text-center">
+      <button type="button" id="notForMe" onClick="window.history.back()" class="btn btn-danger btn-lg">Maybe not for me...</button>
+      <a type="button" href="/" id="another" class="btn btn-success btn-lg">Delicious! Another!</a>
+    </div>
+  </div>
 </div>

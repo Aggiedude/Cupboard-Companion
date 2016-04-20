@@ -1,3 +1,7 @@
+/* CCcolor-red = 160,60,33*/
+/* CCcolor-blue = 0,162,232*/
+/* CCcolor-green = 23,153,17*/
+
 .row {
 	margin-bottom: 20px;
 }
@@ -42,4 +46,36 @@
 
 .border-left {
     border-left: 1px solid black;
+}
+
+.recipe-time-header {
+    background-color: rgba(23, 153, 17, 0.8);
+}
+
+.card-same-height {
+    display: flex;
+}
+
+.card-button {
+    display: table; 
+    margin: auto;
+    margin-bottom: 15px;
+    background-color: rgba(0, 162, 232, 0.8);
+    border-color: rgba(0, 162, 232, 1);
+}
+
+#notForMe {
+    background-color: #c9302c;
+}
+
+#notForMe:hover {
+    background-color: rgba(160, 60, 33, 1);
+}
+
+#another {
+    background-color: rgba(23, 153, 17, 0.8);
+}
+
+#another:hover {
+    background-color: #449D44;
 }
