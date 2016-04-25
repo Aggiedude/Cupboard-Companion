@@ -6,6 +6,10 @@
 	margin-bottom: 20px;
 }
 
+.recipe-page {
+    margin-top: 0px;
+}
+
 #overlay {
     position: absolute;
     left: 0;
@@ -62,6 +66,26 @@
     margin-bottom: 15px;
     background-color: rgba(0, 162, 232, 0.8);
     border-color: rgba(0, 162, 232, 1);
+}
+
+i.check {
+    background: green;
+    padding: 5px;
+    border-radius: 100%;
+    color: white;
+    font-size: 10px;
+}
+
+i.ex {
+    background: red;
+    padding: 5px;
+    border-radius: 100%;
+    color: white;
+    font-size: 10px;
+}
+
+footer {
+    font-size: 10px;
 }
 
 #notForMe {

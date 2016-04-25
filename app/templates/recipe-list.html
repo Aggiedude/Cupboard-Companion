@@ -23,24 +23,36 @@
   </div>
 </nav>
 {% set count = [] %}
-<div class="page-header text-center">
-  <h1>Here be your simple recipes!</h1>
+<div class="fluid-container">
+  <div class="row">
+    <div class="page-header recipe-page text-center">
+      <h1>Here be your simple recipes!</h1>
+      <h4><i class="glyphicon glyphicon-ok check"></i> You have all the ingredients!</h4>
+      <h4><i class="glyphicon glyphicon-remove ex"></i> You are missing a few!</h4>
+    </div>
+  </div>
 </div>
 <div class="fluid-container">
-{% for group_of_3 in tempList|batch(3) %}
+{% for group_of_3 in list|batch(3) %}
   <div class="row card-same-height">
     <div class="col-md-1"></div>
       {% for recipe in group_of_3 %}
         <div class="col-md-3 card-same-height">
           <div class="card" id="recipe{{count|length}}-card">
-            <img class="card-img-top" style="width: 100%; padding: 15px;" src={{recipe.imageURL}} alt={{recipe.name}}>
+            <img class="card-img-top" onerror="this.src='../static/images/icon-thumbnail.png'" style="width: 100%; padding: 15px;" src={{recipe.imageURL}} >
             <div class="card-block">
               <h4 class="card-title" style="text-align: center;">{{recipe.name}}</h4>
               <h6 class="card-subtitle text-muted" style="text-align: center;">Total Time: {{recipe.totalTime}} </h6>
               <hr>
-              <h4 class="card-title">Ingredients</h4>
+              <h4 class="card-title">Ingredients 
+                {% if recipe.haveAllIngredients %}
+                  <i class="glyphicon glyphicon-ok check"></i>
+                {% else %}
+                  <i class="glyphicon glyphicon-remove ex"></i>
+                {% endif %}
+              </h4>
               <ul class="list-group">
-                {% for ingredient in recipe.ingredients %}
+                {% for ingredient in recipe.shownIngredients %}
                   <li class="list-group-item">{{ingredient}}</li>
                 {% endfor %}
               </ul>

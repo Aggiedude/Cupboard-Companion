@@ -51,7 +51,7 @@ $(function(){
             loading();
         }
         else {
-            $('#letsCookDiv').append('<div class="text-center" id="error-message">Sorry, you need to add at least one ingredient, silly!</div>')
+            $('#letsCookDiv').append('<div style="margin-top: 5px;" id="error-message">Sorry, you need to add at least one ingredient, silly!</div>')
             $('#ingredient-form').addClass('has-error');
         }
     });

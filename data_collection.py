@@ -94,15 +94,29 @@ def get_directions(url):
 	page = urllib2.urlopen(url)
 	soup = BeautifulSoup(page, "html.parser")
 
-	direction_soup = soup.find_all(itemprop='recipeInstructions')[0].p
-	directions = direction_soup.get_text() + "\n"
-	siblings = direction_soup.find_next_siblings("p")
-	siblings = siblings[:-2]
+	instruction_soup = soup.find_all("ul", {"class": "recipe-directions-list"})
+	directions = ''
 
-	for sibling in siblings:
-		directions += sibling.get_text() + "\n"
+	for ul in instruction_soup:
+		for li in ul.find_all('li'):
+			directions += li.p.get_text()+"\n"
 
 	return directions
+
+def get_image(url):
+	page = urllib2.urlopen(url)
+	soup = BeautifulSoup(page, "html.parser")
+
+	imageURL = ''
+	image_soup = soup.find_all("div", {"class" :"ico-wrap"})
+	if not image_soup:
+		image_soup = soup.find_all("a", {"class": "ico-wrap", "data-pos": "top"})
+		if image_soup:
+			imageURL = image_soup[0].img['src']
+	else:
+		imageURL = image_soup[0].img['src']
+
+	return imageURL
 
 # main algorithm for project
 # Extracts all necessary data from the yummly api, and calls the simplicity algorithm
@@ -113,11 +127,14 @@ def evaluate_recipe(recipe):
 	sourceDict = recipe['source']
 	sourceName = sourceDict['sourceDisplayName'].encode('ascii','ignore')
 	directionsText = ""
+	imageSource = ""
 
 	# currently, only Food Network sources work. 
 	if "Food Network" in sourceName:
 		directionsText = get_directions(sourceDict['sourceRecipeUrl'])
+		imageSource = get_image(sourceDict['sourceRecipeUrl'])
 		print directionsText
+		print imageSource
 	else:
 		return
 

@@ -1,4 +1,4 @@
-import urllib2, json, string, base64, re, sys
+import urllib2, json, string, base64, re, sys, time
 from bs4 import BeautifulSoup
 from textstat.textstat import textstat
 from flask import Flask, render_template, request, json, url_for
@@ -17,6 +17,7 @@ class Recipe:
 		self.name = name
 		self.ingredients = []
 		self.measuredIngredients = []
+		self.shownIngredients = []
 		self.directions = ''
 		self.prepTime = ''
 		self.cookTime = ''
@@ -30,6 +31,11 @@ class Recipe:
 
 	def addIngredient(self, ing):
 		self.ingredients.extend(ing)
+		if(len(ing) > 4) :
+			self.shownIngredients = ing[:4]
+			self.shownIngredients.append("...")
+		else :
+			self.shownIngredients.extend(ing)
 
 	def addMeasuredIngredient(self, measuredIng):
 		self.measuredIngredients.extend(measuredIng)
@@ -78,69 +84,82 @@ def recipeList():
 
 	begin_recipe_searching(allowedIngredients, [], [])
 
-	return render_template('recipe-list.html')
+	return render_template('recipe-list.html', list=tempList)
 
 @app.route("/recipe-list/view")
 def viewRecipeList():
+	# global tempList
+	# tempList = []
 
-	rec1 = Recipe('Recipe 1')
-	rec1.addIngredient(['cheese', 'eggs'])
-	rec1.addMeasuredIngredient(['2/3 cup cheese', ' 3 eggs'])
-	rec1.addScore(12)
-	rec1.addDirections("Place this in the oven")
-	rec1.addPrepTime('1 hr')
-	rec1.addTotalTime('1 hr')
-	rec1.addImage('http://foodnetwork.sndimg.com/content/dam/images/food/fullset/2003/10/16/3/tm1b51_grilled_cheese.jpg.rend.sni12col.landscape.jpeg')
+	# rec1 = Recipe('Recipe 1')
+	# rec1.addIngredient(['cheese', 'eggs'])
+	# rec1.addMeasuredIngredient(['2/3 cup cheese', ' 3 eggs'])
+	# rec1.addScore(12)
+	# rec1.addDirections("Place this in the oven")
+	# rec1.addPrepTime('1 hr')
+	# rec1.addTotalTime('1 hr')
+	# rec1.hasAllIngredients(True)
+	# rec1.addImage('http://foodnetwork.sndimg.com/content/dam/images/food/fullset/2003/10/16/3/tm1b51_grilled_cheese.jpg.rend.sni12col.landscape.jpeg')
 
-	rec2 = Recipe('Recipe 2')
-	rec2.addIngredient(['cheese','eggs', 'milk'])
-	rec2.addMeasuredIngredient(['1/2 cup cheese','2 eggs', '1 cup milk'])
-	rec2.addScore(50)
-	rec2.addDirections("Place this in the mirowave")
-	rec2.addCookTime('50 min')
-	rec2.addPrepTime('20 min')
-	rec2.addTotalTime('1 hr 10 min')
-	rec2.addImage('http://foodnetwork.sndimg.com/content/dam/images/food/fullset/2010/3/25/0/FNM_050110-Cover-002_s4x3.jpg.rend.sni12col.landscape.jpeg')
+	# rec2 = Recipe('Recipe 2')
+	# rec2.addIngredient(['cheese','eggs', 'milk','bread'])
+	# rec2.addMeasuredIngredient(['1/2 cup cheese','2 eggs', '1 cup milk'])
+	# rec2.addScore(50)
+	# rec2.addDirections("Place this in the mirowave")
+	# rec2.addCookTime('50 min')
+	# rec2.addPrepTime('20 min')
+	# rec2.addTotalTime('1 hr 10 min')
+	# rec2.addImage('http://foodnetwork.sndimg.com/content/dam/images/food/fullset/2010/3/25/0/FNM_050110-Cover-002_s4x3.jpg.rend.sni12col.landscape.jpeg')
 
-	rec3 = Recipe('Recipe 3')
-	rec3.addIngredient(['bread'])
-	rec3.addMeasuredIngredient(['3 loaves bread'])
-	rec3.addScore(6)
-	rec3.addDirections("Place this in the stove")
-	rec3.addCookTime('1 hr 10 min')
-	rec3.addTotalTime('1 hr 10 min')
-	rec3.addImage('http://foodnetwork.sndimg.com/content/dam/images/food/fullset/2008/7/2/0/PB0108_Chicken-Salad-Sliders.jpg.rend.sni12col.landscape.jpeg')
+	# rec3 = Recipe('Recipe 3')
+	# rec3.addIngredient(['bread'])
+	# rec3.addMeasuredIngredient(['3 loaves bread'])
+	# rec3.addScore(6)
+	# rec3.addDirections("Place this in the stove")
+	# rec3.addCookTime('1 hr 10 min')
+	# rec3.addTotalTime('1 hr 10 min')
+	# rec3.addImage('http://foodnetwork.sndimg.com/content/dam/images/food/fullset/2008/7/2/0/PB0108_Chicken-Salad-Sliders.jpg.rend.sni12col.landscape.jpeg')
 
-	rec4 = Recipe('Recipe 4')
-	rec4.addIngredient(['cheese','eggs', 'bread', 'onion'])
-	rec4.addMeasuredIngredient(['1 cup cheese','2 scrambled eggs', '2 slices bread', '1 diced onion'])
-	rec4.addScore(78)
-	rec4.addDirections("Place this in the fridge")
-	rec4.addCookTime('20 min')
-	rec4.addPrepTime('10 min')
-	rec4.addTotalTime('30 min')
-	rec4.addImage('http://foodnetwork.sndimg.com/content/dam/images/food/fullset/2007/3/8/0/tu0211_sandwich.jpg.rend.sni12col.landscape.jpeg')
+	# rec4 = Recipe('Recipe 4')
+	# rec4.addIngredient(['cheese','eggs', 'bread', 'onion', 'garlic', 'pepper'])
+	# rec4.addMeasuredIngredient(['1 cup cheese','2 scrambled eggs', '2 slices bread', '1 diced onion'])
+	# rec4.addScore(78)
+	# rec4.addDirections("Place this in the fridge")
+	# rec4.addCookTime('20 min')
+	# rec4.addPrepTime('10 min')
+	# rec4.addTotalTime('30 min')
+	# rec4.addImage('http://foodnetwork.sndimg.com/content/dam/images/food/fullset/2007/3/8/0/tu0211_sandwich.jpg.rend.sni12col.landscape.jpeg')
 
-	tempList.append(rec1)
-	tempList.append(rec2)
-	tempList.append(rec3)
-	tempList.append(rec4)
+	# tempList.append(rec1)
+	# tempList.append(rec2)
+	# tempList.append(rec3)
+	# tempList.append(rec4)
 
-	tempList.sort(key= lambda x: x.score)
+	# tempList.sort(key= lambda x: x.score)
+	# return render_template('recipe-list.html', list = tempList)
 
-	return render_template('recipe-list.html', tempList = tempList)
+	recipeList.sort(key=lambda x: x.score)
+	return render_template('recipe-list.html', list = recipeList)
 
 @app.route('/recipe/<recName>')
 def viewRecipe(recName):
 	print "got here"
 	recIndex = None
 	i = 0
-	while i < len(tempList):
-		if tempList[i].name == str(recName):
+	# while i < len(tempList):
+	# 	if tempList[i].name == str(recName):
+	# 		recIndex = i
+	# 		break
+	# 	i+=1
+
+	# return render_template('recipe.html', recipe=tempList[recIndex])
+	while i < len(recipeList):
+		if recipeList[i].name == str(recName):
 			recIndex = i
 			break
 		i+=1
-	return render_template('recipe.html', recipe=tempList[recIndex])
+	
+	return render_template('recipe.html', recipe=recipeList[recIndex])
 
 # replaces common characters in URL queries with appropriately formatted characters
 def replace_chars(query):
@@ -203,6 +222,23 @@ def get_directions(url):
 
 	return directions
 
+# Scrapes the source HTML page gathered from the yummly api for recipe image 
+# currently only works with recipes taken from foodnetwork.com
+def get_image(url):
+	page = urllib2.urlopen(url)
+	soup = BeautifulSoup(page, "html.parser")
+
+	imageURL = ''
+	image_soup = soup.find_all("div", {"class" :"ico-wrap"})
+	if not image_soup:
+		image_soup = soup.find_all("a", {"class": "ico-wrap", "data-pos": "top"})
+		if image_soup:
+			imageURL = image_soup[0].img['src']
+	else:
+		imageURL = image_soup[0].img['src']
+
+	return imageURL
+
 # main algorithm for project
 # Extracts all necessary data from the yummly api, and calls the simplicity algorithm
 def evaluate_recipe(allowedIngredients, recipe):
@@ -212,11 +248,14 @@ def evaluate_recipe(allowedIngredients, recipe):
 	sourceDict = recipe['source']
 	sourceName = sourceDict['sourceDisplayName'].encode('ascii','ignore')
 	directionsText = ""
+	imageSource = ""
 
 	# currently, only Food Network sources work. 
 	if "Food Network" in sourceName:
 		directionsText = get_directions(sourceDict['sourceRecipeUrl'])
+		imageSource = get_image(sourceDict['sourceRecipeUrl'])
 		print directionsText
+		print imageSource
 	else:
 		return
 
@@ -249,6 +288,7 @@ def evaluate_recipe(allowedIngredients, recipe):
 		rec.addIngredient(mainIngredientRecipes[mainIngredientRecipes.index(recipe['id'])+1])
 		rec.addMeasuredIngredient(ingredientList)		
 		rec.addDirections(directionsText)
+		rec.addImage(imageSource)
 		rec.addPrepTime(prepTimeProper)
 		rec.addCookTime(cookTimeProper)
 		rec.addTotalTime(totalTimeProper)
@@ -283,6 +323,9 @@ def printResults(ingList):
 	
 def begin_recipe_searching(allowedIngredients, disallowedIngredients, cuisineType):
 	#credentials structure: _app_id=app-id&_app_key=app-key
+	global recipeList
+	recipeList = []
+
 	yummlyAppID = "1a10b2e0"
 	yummlyAppKey = "72595b3dee46471a8a93caa35baf8ef1"
 	yummlyCredentials = '%s=%s&%s=%s' % ('_app_id', yummlyAppID, '_app_key', yummlyAppKey)
