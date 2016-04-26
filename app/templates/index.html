@@ -11,6 +11,7 @@
 	<script type="text/javascript" src="static/js/jquery-1.12.3.min.js"></script>
 	<script type="text/javascript" src="static/js/bootstrap.js"></script>
   <script type="text/javascript" src="static/js/letsCook.js"></script>
+  <script type="text/javascript" src="static/js/addButton.js"></script>
 	
 </head>
 <nav class="navbar navbar-default">
@@ -30,9 +31,9 @@
 </div>
 <div class="fluid-container">
   <div class="row">
-  <div class="col-md-4">
+  <div id="IngredientBoxesGroup" class="col-md-4">
       <p class="text-center">What ingredients do you have on hand?</p>
-  <form class="form-horizontal" id="ingredient-form">
+  <form class="form-horizontal" id="ingredient-form-incing">
   <div class="form-group">
     <label for="ingredient1" class="col-sm-4 control-label">Ingredient 1</label>
     <div class="col-sm-8">
@@ -57,9 +58,9 @@
       <input type="text" class="form-control" name="ingredient4" id="ingredient4" placeholder="ingredient 4">
     </div>
   </div>
-  <div class="form-group">
+  <div id="buttondivincing" class="form-group">
     <span class="col-sm-4"></span>
-    <button type="button" style="margin-left: 15px" class=" btn btn-default"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Another Ingredient</button>
+    <button type="button" id='addIncIngButton' style="margin-left: 15px" class=" btn btn-default"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Another Ingredient</button>
   </div>
 </form>
   </div>
@@ -100,7 +101,7 @@
 </div>
   <div class="col-md-4">
       <p class="text-center">Any ingredients you absolutely don't want included?</p>
-  <form class="form-horizontal">
+  <form class="form-horizontal" id="ingredient-form-exing">
   <div class="form-group">
     <label for="xingredient1" class="col-sm-4 control-label">Ingredient 1</label>
     <div class="col-sm-8">
@@ -125,9 +126,9 @@
       <input type="text" class="form-control" name="xingredient4" id="xingredient4" placeholder="ingredient 4">
     </div>
   </div>
-  <div class="form-group">
+  <div id="buttondivexing" class="form-group">
     <span class="col-sm-4"></span>
-    <button type="button" style="margin-left: 15px" class=" btn btn-default"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Another Ingredient</button>
+    <button type="button" id="addExIngButton" style="margin-left: 15px" class=" btn btn-default"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Another Ingredient</button>
   </div>
 </form>
   </div>
@@ -142,7 +143,7 @@
 <div class="row">
 <div class="form-group">
     <div class="col-sm-offset-2 col-sm-10">
-      <button type="submit" class="btn btn-danger" style="width: inherit; height: 50px;" id="testRecipe">Test some Recipes!</button>
+      <button type="submit" id='addExIngButton' class="btn btn-danger" style="width: inherit; height: 50px;" id="testRecipe">Test some Recipes!</button>
     </div>
   </div>
 </div>

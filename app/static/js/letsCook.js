@@ -22,7 +22,7 @@ $(function(){
 		$('#lmOne').delay(1500).fadeOut(800);
 		$('#lmTwo').delay(3000).fadeIn(800);
 	}
-
+	
     $('#letsCook').click(function(){
         var ingredients = [$('#ingredient1').val(),$('#ingredient2').val(),$('#ingredient3').val(),$('#ingredient4').val()];
         var has_ingredients = false;
