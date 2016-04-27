@@ -13,14 +13,25 @@ $(function(){
 			'<br><div id="loadingMessage">' +
 				'<div id="lmOne">Going to the store...</div>' +
 				'<div id="lmTwo">Calling Mom...</div>' +
+				'<div id="lmThree">Looking in the fridge...</div>' +
+				'<div id="lmFour">Browsing through cookbooks...</div>' +
+				'<div id="lmFive">Your recipes are on their way!</div>' +
 			'</div>' +
         '</div>' +
 	   '</div>';
 	   
+	   
+		var delayCount = 1500;
 		$(over).appendTo('body');
 		$('#lmTwo').hide();
-		$('#lmOne').delay(1500).fadeOut(800);
-		$('#lmTwo').delay(3000).fadeIn(800);
+		$('#lmThree').hide();
+		$('#lmFour').hide();
+		$('#lmFive').hide();
+		$('#lmOne').delay(delayCount).fadeOut(800);
+		$('#lmTwo').delay(delayCount*2).fadeIn(800).delay(delayCount).fadeOut(800);
+		$('#lmThree').delay(delayCount*4).fadeIn(800).delay(delayCount).fadeOut(800);
+		$('#lmFour').delay(delayCount*6).fadeIn(800).delay(delayCount).fadeOut(800);
+		$('#lmFive').delay(delayCount*8).fadeIn(800);
 	}
 	
     $('#letsCook').click(function(){
