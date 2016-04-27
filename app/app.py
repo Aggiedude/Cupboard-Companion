@@ -7,6 +7,7 @@ recipeList = []
 mainIngredientRecipes = []
 tempList = []
 commonCupboard = ['salt','egg','eggs','butter','oil','sugar','granulated sugar','pepper','garlic','milk','all-purpose flour','flour','water']
+madeSearch = False
 
 app = Flask(__name__)
 app.jinja_env.add_extension('jinja2.ext.do')
@@ -142,8 +143,14 @@ def viewRecipeList():
 
 	# tempList.sort(key= lambda x: x.score)
 	# return render_template('recipe-list.html', list = tempList)
+	global recipeList
 
-	recipeList.sort(key=lambda x: x.score)
+	try:
+		if len(recipeList) == 0:
+			return render_template('error.html', search=madeSearch)
+	except:
+		return render_template('error.html', search=madeSearch)
+
 	return render_template('recipe-list.html', list = recipeList)
 
 @app.route('/recipe/<recName>')
@@ -329,7 +336,9 @@ def printResults(ingList):
 def begin_recipe_searching(allowedIngredients, disallowedIngredients, courseTypes):
 	#credentials structure: _app_id=app-id&_app_key=app-key
 	global recipeList
+	global madeSearch
 	recipeList = []
+	madeSearch = True
 
 	yummlyAppID = "1a10b2e0"
 	yummlyAppKey = "72595b3dee46471a8a93caa35baf8ef1"
@@ -351,7 +360,7 @@ def begin_recipe_searching(allowedIngredients, disallowedIngredients, courseType
 
 	recipeSource = "&allowedSource=Food+Network"
 
-	searchParamenters = urlQuery + urlIngredients + recipeSource + '&maxResult=5'
+	searchParamenters = urlQuery + urlIngredients + recipeSource + '&maxResult=1'
 	#print searchParamenters
 	
 	url = 'http://api.yummly.com/v1/api/recipes?%s&%s' % (yummlyCredentials, searchParamenters)

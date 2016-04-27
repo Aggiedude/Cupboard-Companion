@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+	<title>Cupboard Companion - Error Page</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<meta name="author" content="Andrew Chepey - andrew.chepey@tamu.edu; Amanda Schlaudt - aschlaudt@tamu.edu"/>
+
+	 <link rel="stylesheet" href="../static/css/bootstrap.css">
+  <link rel="stylesheet" href="../static/css/style.css">
+  <script type="text/javascript" src="../static/js/jquery-1.12.3.min.js"></script>
+  <script type="text/javascript" src="../static/js/bootstrap.js"></script>
+</head>
+
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+  	<div class="navbar-header">
+  		<a class="navbar-brand" href="/">Cupboard Companion</a>
+  	</div>
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="../about-us">About Us</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="fluid-container">
+  <div class="row">
+    <div class="text-center">
+      <h1 class="page-header">Uh oh! It seems you have run into an error!</h1>
+      {% if search %}
+      	<h2>No recipes can be found from your request!</h2>
+      {% else %}
+      	<h2>You've come to this page by mistake!</h2>
+      {% endif %}
+    </div>
+  </div>
+  <div class="row">
+  	<div class="text-center">
+  		<h2>Lets roll on back to the home page. <a href="/">Click here!</a></h2>
+  	</div>
+  </div>
+</div>
+
+</html>
