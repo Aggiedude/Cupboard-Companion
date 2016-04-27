@@ -35,7 +35,7 @@ $(function(){
 
         if(has_ingredients){
             $('#letsCookDiv').remove("#error-message")
-            $('#ingredient-form').removeClass('has-error');
+            $('#ingredient-form-incing').removeClass('has-error');
             $.ajax({
                 url: '/recipe-list',
                 data: $('form').serialize(),
@@ -51,8 +51,13 @@ $(function(){
             loading();
         }
         else {
-            $('#letsCookDiv').append('<div style="margin-top: 5px;" id="error-message">Sorry, you need to add at least one ingredient, silly!</div>')
-            $('#ingredient-form').addClass('has-error');
+            if ( $('#error-message').length ){
+                ;
+            }
+            else{
+                $('#letsCookDiv').append('<div style="margin-top: 5px;" id="error-message">Sorry, you need to add at least one ingredient, silly!</div>')
+            }
+            $('#ingredient-form-incing').addClass('has-error');
         }
     });
 

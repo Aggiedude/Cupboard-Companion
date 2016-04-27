@@ -71,18 +71,23 @@ def aboutUs():
 	
 @app.route("/recipe-list", methods=['POST'])
 def recipeList():
-	ingredient1 = request.form['ingredient1'].encode('ascii','ignore')
-	ingredient2 = request.form['ingredient2'].encode('ascii','ignore')
-	ingredient3 = request.form['ingredient3'].encode('ascii','ignore')
-	ingredient4 = request.form['ingredient4'].encode('ascii','ignore')
 
+	form = request.form
+
+	keys = form.keys()
 	allowedIngredients = []
-	allowedIngredients.append(ingredient1)
-	allowedIngredients.append(ingredient2)
-	allowedIngredients.append(ingredient3)
-	allowedIngredients.append(ingredient4)
+	disallowedIngredients = []
+	courseTypes = []
 
-	begin_recipe_searching(allowedIngredients, [], [])
+	for key in keys:
+		if key[:3] == 'ing':
+			allowedIngredients.append(form[key].encode('ascii','ignore'))
+		elif key[:3] == 'xin':
+			disallowedIngredients.append(form[key].encode('ascii','ignore'))
+		else:
+			courseTypes.append(key.encode('ascii','ignore'))
+
+	begin_recipe_searching(allowedIngredients, disallowedIngredients, courseTypes)
 
 	return render_template('recipe-list.html', list=tempList)
 
@@ -321,7 +326,7 @@ def printResults(ingList):
 		print str(i+1) + '. ' + str(recipeList[i].name) + ' - ' + str(recipeList[i].score) 
 		i += 1
 	
-def begin_recipe_searching(allowedIngredients, disallowedIngredients, cuisineType):
+def begin_recipe_searching(allowedIngredients, disallowedIngredients, courseTypes):
 	#credentials structure: _app_id=app-id&_app_key=app-key
 	global recipeList
 	recipeList = []
@@ -332,9 +337,17 @@ def begin_recipe_searching(allowedIngredients, disallowedIngredients, cuisineTyp
 			
 	urlQuery = "q=Food+Network"
 	urlIngredients = ''
+	urlXIngredients = ''
+	urlCourseTypes = ''
 	for ing in allowedIngredients:
 		if ing:
 			urlIngredients = urlIngredients + '&allowedIngredient[]=%s' % ing.strip()
+	for ing in disallowedIngredients:
+		if ing:
+			urlXIngredients = urlXIngredients + '&excludedIngredient[]=%s' % ing.strip()
+	for course in courseTypes:
+		if course:
+			urlCourseTypes = urlCourseTypes + '&allowedCourse[]=course^course-%s' % ing.strip()
 
 	recipeSource = "&allowedSource=Food+Network"
 
