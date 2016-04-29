@@ -360,7 +360,7 @@ def begin_recipe_searching(allowedIngredients, disallowedIngredients, courseType
 
 	recipeSource = "&allowedSource=Food+Network"
 
-	searchParamenters = urlQuery + urlIngredients + recipeSource + '&maxResult=1'
+	searchParamenters = urlQuery + urlIngredients + recipeSource + '&maxResult=10'
 	#print searchParamenters
 	
 	url = 'http://api.yummly.com/v1/api/recipes?%s&%s' % (yummlyCredentials, searchParamenters)
