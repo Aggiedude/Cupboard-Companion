@@ -26,6 +26,7 @@ class Recipe:
 		self.haveAllIngredients = False
 		self.score = 0
 		self.imageURL = ''
+		self.sourceURL = ''
 
 	def __str__(self):
 		return self.name+'\n'+str(self.ingredients)+'\n'+str(self.score)
@@ -62,6 +63,9 @@ class Recipe:
 	def addImage(self, url):
 		self.imageURL = url
 
+	def addSourceURL(self, url):
+		self.sourceURL = url
+
 @app.route("/")
 def main():
 	return render_template('index.html')
@@ -94,55 +98,6 @@ def recipeList():
 
 @app.route("/recipe-list/view")
 def viewRecipeList():
-	# global tempList
-	# tempList = []
-
-	# rec1 = Recipe('Recipe 1')
-	# rec1.addIngredient(['cheese', 'eggs'])
-	# rec1.addMeasuredIngredient(['2/3 cup cheese', ' 3 eggs'])
-	# rec1.addScore(12)
-	# rec1.addDirections("Place this in the oven")
-	# rec1.addPrepTime('1 hr')
-	# rec1.addTotalTime('1 hr')
-	# rec1.hasAllIngredients(True)
-	# rec1.addImage('http://foodnetwork.sndimg.com/content/dam/images/food/fullset/2003/10/16/3/tm1b51_grilled_cheese.jpg.rend.sni12col.landscape.jpeg')
-
-	# rec2 = Recipe('Recipe 2')
-	# rec2.addIngredient(['cheese','eggs', 'milk','bread'])
-	# rec2.addMeasuredIngredient(['1/2 cup cheese','2 eggs', '1 cup milk'])
-	# rec2.addScore(50)
-	# rec2.addDirections("Place this in the mirowave")
-	# rec2.addCookTime('50 min')
-	# rec2.addPrepTime('20 min')
-	# rec2.addTotalTime('1 hr 10 min')
-	# rec2.addImage('http://foodnetwork.sndimg.com/content/dam/images/food/fullset/2010/3/25/0/FNM_050110-Cover-002_s4x3.jpg.rend.sni12col.landscape.jpeg')
-
-	# rec3 = Recipe('Recipe 3')
-	# rec3.addIngredient(['bread'])
-	# rec3.addMeasuredIngredient(['3 loaves bread'])
-	# rec3.addScore(6)
-	# rec3.addDirections("Place this in the stove")
-	# rec3.addCookTime('1 hr 10 min')
-	# rec3.addTotalTime('1 hr 10 min')
-	# rec3.addImage('http://foodnetwork.sndimg.com/content/dam/images/food/fullset/2008/7/2/0/PB0108_Chicken-Salad-Sliders.jpg.rend.sni12col.landscape.jpeg')
-
-	# rec4 = Recipe('Recipe 4')
-	# rec4.addIngredient(['cheese','eggs', 'bread', 'onion', 'garlic', 'pepper'])
-	# rec4.addMeasuredIngredient(['1 cup cheese','2 scrambled eggs', '2 slices bread', '1 diced onion'])
-	# rec4.addScore(78)
-	# rec4.addDirections("Place this in the fridge")
-	# rec4.addCookTime('20 min')
-	# rec4.addPrepTime('10 min')
-	# rec4.addTotalTime('30 min')
-	# rec4.addImage('http://foodnetwork.sndimg.com/content/dam/images/food/fullset/2007/3/8/0/tu0211_sandwich.jpg.rend.sni12col.landscape.jpeg')
-
-	# tempList.append(rec1)
-	# tempList.append(rec2)
-	# tempList.append(rec3)
-	# tempList.append(rec4)
-
-	# tempList.sort(key= lambda x: x.score)
-	# return render_template('recipe-list.html', list = tempList)
 	global recipeList
 
 	try:
@@ -158,11 +113,6 @@ def viewRecipe(recName):
 	print "got here"
 	recIndex = None
 	i = 0
-	# while i < len(tempList):
-	# 	if tempList[i].name == str(recName):
-	# 		recIndex = i
-	# 		break
-	# 	i+=1
 
 	# return render_template('recipe.html', recipe=tempList[recIndex])
 	while i < len(recipeList):
@@ -234,28 +184,37 @@ def get_directions(source, url):
 		for sibling in siblings:
 			directions += sibling.get_text() + "\n"
 			
-	elif "AllRecipes" in source:
+	elif "allrecipes" in source:
 		instruction_soup = soup.find_all("ol", {"class": "list-numbers recipe-directions__list"})
 		for ol in instruction_soup:
 			for li in ol.find_all('li'):
 				directions += li.find("span", {"class": "recipe-directions__list--item"}).get_text()
 
+	elif source == 'food.com':
+		direction_soup = soup.find_all("div", {"class" : "directions"})
+		for li in direction_soup[0].find_all("ol"):
+			directions += li.get_text()
+
 	return directions
 
 # Scrapes the source HTML page gathered from the yummly api for recipe image 
 # currently only works with recipes taken from foodnetwork.com
-def get_image(url):
+def get_image(source, url):
 	page = urllib2.urlopen(url)
 	soup = BeautifulSoup(page, "html.parser")
 
 	imageURL = ''
-	image_soup = soup.find_all("div", {"class" :"ico-wrap"})
-	if not image_soup:
-		image_soup = soup.find_all("a", {"class": "ico-wrap", "data-pos": "top"})
-		if image_soup:
+	if source == 'foodnetwork':
+		image_soup = soup.find_all("div", {"class" :"ico-wrap"})
+		if not image_soup:
+			image_soup = soup.find_all("a", {"class": "ico-wrap", "data-pos": "top"})
+			if image_soup:
+				imageURL = image_soup[0].img['src']
+		else:
 			imageURL = image_soup[0].img['src']
-	else:
-		imageURL = image_soup[0].img['src']
+	elif source == 'food.com':
+		imagesoup = actualsoup.find_all("div", {"class" : "trans-img"})
+		imageURL = imagesoup[0].img['data-src']
 
 	return imageURL
 
@@ -269,15 +228,22 @@ def evaluate_recipe(allowedIngredients, recipe):
 	sourceName = sourceDict['sourceDisplayName'].encode('ascii','ignore')
 	directionsText = ""
 	imageSource = ""
+	sourceURL = sourceDict['sourceRecipeUrl']
+	print "SOURCE is: " + sourceURL
 
 	# currently, only Food Network sources work. 
 	if "Food Network" in sourceName:
-		directionsText = get_directions("Food Network", sourceDict['sourceRecipeUrl'])
-		imageSource = get_image(sourceDict['sourceRecipeUrl'])
+		directionsText = get_directions('foodnetwork',sourceURL)
+		imageSource = get_image('foodnetwork',sourceURL)
+		print directionsText
+		print imageSource
+	elif "Food.com" in sourceName:
+		directionsText = get_directions('food.com',sourceURL)
+		imageSource = get_image('food.com',sourceURL)
 		print directionsText
 		print imageSource
 	elif "AllRecipes" in sourceName:
-		directionsText = get_directions("AllRecipes", sourceDict['sourceRecipeUrl'])
+		directionsText = get_directions("allrecipes", sourceURL)
 		imageSource = recipe['images'][0]['imageUrlsBySize']['360']
 		print directionsText
 		print imageSource
@@ -318,6 +284,7 @@ def evaluate_recipe(allowedIngredients, recipe):
 		rec.addCookTime(cookTimeProper)
 		rec.addTotalTime(totalTimeProper)
 		rec.hasAllIngredients(numMissingIngr == 0)
+		rec.addSourceURL(sourceURL)
 
 		simplicityScore = evaluate_simplicity(numTotalIngredients,prepTime,cookTime,numMissingIngr,directionsText)
 		rec.addScore(simplicityScore)
