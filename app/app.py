@@ -220,17 +220,25 @@ def get_recipe(recipeID, yummlyCredentials):
 
 # Scrapes the source HTML page gathered from the yummly api for recipe directions 
 # currently only works with recipes taken from foodnetwork.com
-def get_directions(url):
+def get_directions(source, url):
 	page = urllib2.urlopen(url)
 	soup = BeautifulSoup(page, "html.parser")
+	directions = ''
 
-	direction_soup = soup.find_all(itemprop='recipeInstructions')[0].p
-	directions = direction_soup.get_text() + "\n"
-	siblings = direction_soup.find_next_siblings("p")
-	siblings = siblings[:-2]
+	if "Food Network" in source:
+		direction_soup = soup.find_all(itemprop='recipeInstructions')[0].p
+		directions = direction_soup.get_text() + "\n"
+		siblings = direction_soup.find_next_siblings("p")
+		siblings = siblings[:-2]
 
-	for sibling in siblings:
-		directions += sibling.get_text() + "\n"
+		for sibling in siblings:
+			directions += sibling.get_text() + "\n"
+			
+	elif "AllRecipes" in source:
+		instruction_soup = soup.find_all("ol", {"class": "list-numbers recipe-directions__list"})
+		for ol in instruction_soup:
+			for li in ol.find_all('li'):
+				directions += li.find("span", {"class": "recipe-directions__list--item"}).get_text()
 
 	return directions
 
@@ -264,8 +272,13 @@ def evaluate_recipe(allowedIngredients, recipe):
 
 	# currently, only Food Network sources work. 
 	if "Food Network" in sourceName:
-		directionsText = get_directions(sourceDict['sourceRecipeUrl'])
+		directionsText = get_directions("Food Network", sourceDict['sourceRecipeUrl'])
 		imageSource = get_image(sourceDict['sourceRecipeUrl'])
+		print directionsText
+		print imageSource
+	elif "AllRecipes" in sourceName:
+		directionsText = get_directions("AllRecipes", sourceDict['sourceRecipeUrl'])
+		imageSource = recipe['images'][0]['imageUrlsBySize']['360']
 		print directionsText
 		print imageSource
 	else:
