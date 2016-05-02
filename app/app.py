@@ -175,7 +175,7 @@ def get_directions(source, url):
 	soup = BeautifulSoup(page, "html.parser")
 	directions = ''
 
-	if "Food Network" in source:
+	if "foodnetwork" in source:
 		direction_soup = soup.find_all(itemprop='recipeInstructions')[0].p
 		directions = direction_soup.get_text() + "\n"
 		siblings = direction_soup.find_next_siblings("p")
@@ -190,7 +190,8 @@ def get_directions(source, url):
 			for li in ol.find_all('li'):
 				directions += li.find("span", {"class": "recipe-directions__list--item"}).get_text()
 
-	elif source == 'food.com':
+	elif "food.com" in source:
+		print "food.com directions scrape"
 		direction_soup = soup.find_all("div", {"class" : "directions"})
 		for li in direction_soup[0].find_all("ol"):
 			directions += li.get_text()
@@ -212,9 +213,16 @@ def get_image(source, url):
 				imageURL = image_soup[0].img['src']
 		else:
 			imageURL = image_soup[0].img['src']
+
 	elif source == 'food.com':
-		imagesoup = actualsoup.find_all("div", {"class" : "trans-img"})
-		imageURL = imagesoup[0].img['data-src']
+		print "food.com image scrape"
+		image_soup = soup.find_all("div", {"class" : "trans-img"})
+		if not image_soup:
+			imageURL = ""
+		else:
+			imageURL = image_soup[0].img['data-src']
+
+	print imageURL
 
 	return imageURL
 
@@ -238,6 +246,7 @@ def evaluate_recipe(allowedIngredients, recipe):
 		print directionsText
 		print imageSource
 	elif "Food.com" in sourceName:
+		print "source name is food.com"
 		directionsText = get_directions('food.com',sourceURL)
 		imageSource = get_image('food.com',sourceURL)
 		print directionsText
@@ -338,21 +347,50 @@ def begin_recipe_searching(allowedIngredients, disallowedIngredients, courseType
 		if course:
 			urlCourseTypes = urlCourseTypes + '&allowedCourse[]=course^course-%s' % ing.strip()
 
-	recipeSource = "&allowedSource=Food+Network"
+	completeRecipes = []
 
-	searchParamenters = urlQuery + urlIngredients + recipeSource + '&maxResult=10'
-	#print searchParamenters
+	# Food Network Call
+	print "Calling Food Network"
+	searchParamenters = urlQuery + urlIngredients + urlXIngredients + urlCourseTypes + '&maxResult=6'
 	
 	url = 'http://api.yummly.com/v1/api/recipes?%s&%s' % (yummlyCredentials, searchParamenters)
 	results = process_request(url)
-	
-	completeRecipes = []
+
 	for item in results["matches"]:
 		#print item['id']
 		mainIngredientRecipes.append(item['id'])
 		mainIngredientRecipes.append(item['ingredients'])
 		completeRecipes.append(get_recipe(item['id'], yummlyCredentials))
-		
+
+	# AllRecipes Call
+	print "Calling AllRecipes"
+	urlQuery = "q=allrecipes"
+	searchParamenters = urlQuery + urlIngredients + urlXIngredients + urlCourseTypes + '&maxResult=6'
+	#print searchParamenters
+	
+	url = 'http://api.yummly.com/v1/api/recipes?%s&%s' % (yummlyCredentials, searchParamenters)
+	results = process_request(url)
+	
+	for item in results["matches"]:
+		mainIngredientRecipes.append(item['id'])
+		mainIngredientRecipes.append(item['ingredients'])
+		completeRecipes.append(get_recipe(item['id'], yummlyCredentials))
+
+	# Food.com Call
+	print "Calling Food.com"
+	urlQuery = "q=foodcom"
+	searchParamenters = urlQuery + urlIngredients + urlXIngredients + urlCourseTypes + '&maxResult=6'
+	#print searchParamenters
+	
+	url = 'http://api.yummly.com/v1/api/recipes?%s&%s' % (yummlyCredentials, searchParamenters)
+	results = process_request(url)
+	
+	for item in results["matches"]:
+		mainIngredientRecipes.append(item['id'])
+		mainIngredientRecipes.append(item['ingredients'])
+		completeRecipes.append(get_recipe(item['id'], yummlyCredentials))
+
+
 	# evaluate the simplicity for every recipe gathered
 	for item in completeRecipes:
 		evaluate_recipe(allowedIngredients, item)
