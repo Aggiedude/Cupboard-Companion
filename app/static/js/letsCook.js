@@ -11,11 +11,15 @@ $(function(){
             '<div id="fountainG_7" class="fountainG"></div>'+
             '<div id="fountainG_8" class="fountainG"></div>'+
 			'<br><div id="loadingMessage">' +
-				'<div id="lmOne">Going to the store...</div>' +
-				'<div id="lmTwo">Calling Mom...</div>' +
-				'<div id="lmThree">Looking in the fridge...</div>' +
-				'<div id="lmFour">Browsing through cookbooks...</div>' +
-				'<div id="lmFive">Your recipes are on their way!</div>' +
+				'<span id="lmOne">Going to the store...</span>' +
+				'<span id="lmTwo">Calling Mom...</span>' +
+				'<span id="lmThree">Looking in the fridge...</span>' +
+				'<span id="lmFour">Browsing through cookbooks...</span>' +
+                '<span id="lmFive">Putting out fire...</span>' +
+                '<span id="lmSix">Trying to find your Facebook account...</span>' +
+                '<span id="lmSeven">Doing a taste test...</span>' +
+                '<span id="lmEight">Buying new stove...</span>' +
+				'<span id="lmNine">Your recipes are on their way!</span>' +
 			'</div>' +
         '</div>' +
 	   '</div>';
@@ -27,11 +31,19 @@ $(function(){
 		$('#lmThree').hide();
 		$('#lmFour').hide();
 		$('#lmFive').hide();
+        $('#lmSix').hide();
+        $('#lmSeven').hide();
+        $('#lmEight').hide();
+        $('#lmNine').hide();
 		$('#lmOne').delay(delayCount).fadeOut(800);
 		$('#lmTwo').delay(delayCount*2).fadeIn(800).delay(delayCount).fadeOut(800);
 		$('#lmThree').delay(delayCount*4).fadeIn(800).delay(delayCount).fadeOut(800);
 		$('#lmFour').delay(delayCount*6).fadeIn(800).delay(delayCount).fadeOut(800);
-		$('#lmFive').delay(delayCount*8).fadeIn(800);
+        $('#lmFive').delay(delayCount*8).fadeIn(800).delay(delayCount).fadeOut(800);
+        $('#lmSix').delay(delayCount*10).fadeIn(800).delay(delayCount).fadeOut(800);
+        $('#lmSeven').delay(delayCount*12).fadeIn(800).delay(delayCount).fadeOut(800);
+        $('#lmEight').delay(delayCount*14).fadeIn(800).delay(delayCount).fadeOut(800);
+		$('#lmNine').delay(delayCount*16).fadeIn(800);
 	}
 	
     $('#letsCook').click(function(){

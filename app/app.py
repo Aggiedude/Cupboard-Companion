@@ -357,7 +357,7 @@ def begin_recipe_searching(allowedIngredients, disallowedIngredients, courseType
 
 	# Food Network Call
 	print "Calling Food Network"
-	searchParamenters = urlQuery + urlIngredients + urlXIngredients + urlCourseTypes + '&maxResult=6'
+	searchParamenters = urlQuery + urlIngredients + urlXIngredients + urlCourseTypes + '&maxResult=4'
 	
 	if inRush:
 		searchParamenters += '&maxTotalTimeInSeconds=2100'
@@ -374,7 +374,7 @@ def begin_recipe_searching(allowedIngredients, disallowedIngredients, courseType
 	# AllRecipes Call
 	print "Calling AllRecipes"
 	urlQuery = "q=allrecipes"
-	searchParamenters = urlQuery + urlIngredients + urlXIngredients + urlCourseTypes + '&maxResult=6'
+	searchParamenters = urlQuery + urlIngredients + urlXIngredients + urlCourseTypes + '&maxResult=4'
 	if inRush:
 		searchParamenters += '&maxTotalTimeInSeconds=2100'
 	
@@ -389,7 +389,7 @@ def begin_recipe_searching(allowedIngredients, disallowedIngredients, courseType
 	# Food.com Call
 	print "Calling Food.com"
 	urlQuery = "q=foodcom"
-	searchParamenters = urlQuery + urlIngredients + urlXIngredients + urlCourseTypes + '&maxResult=6'
+	searchParamenters = urlQuery + urlIngredients + urlXIngredients + urlCourseTypes + '&maxResult=4'
 	if inRush:
 		searchParamenters += '&maxTotalTimeInSeconds=2100'
 	
