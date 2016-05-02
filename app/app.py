@@ -74,8 +74,8 @@ def main():
 def aboutUs():
 	return render_template('about-us.html')
 	
-@app.route("/recipe-list", methods=['POST'])
-def recipeList():
+@app.route("/recipe-list/<rush>", methods=['POST'])
+def recipeList(rush):
 
 	form = request.form
 
@@ -83,6 +83,7 @@ def recipeList():
 	allowedIngredients = []
 	disallowedIngredients = []
 	courseTypes = []
+	inRush = False
 
 	for key in keys:
 		if key[:3] == 'ing':
@@ -92,7 +93,12 @@ def recipeList():
 		else:
 			courseTypes.append(key.encode('ascii','ignore'))
 
-	begin_recipe_searching(allowedIngredients, disallowedIngredients, courseTypes)
+	if int(rush) is 1:
+		inRush = True
+		print inRush
+	print inRush
+
+	begin_recipe_searching(allowedIngredients, disallowedIngredients, courseTypes, inRush)
 
 	return render_template('recipe-list.html', list=tempList)
 
@@ -205,7 +211,7 @@ def get_image(source, url):
 	soup = BeautifulSoup(page, "html.parser")
 
 	imageURL = ''
-	if source == 'foodnetwork':
+	if source is 'foodnetwork':
 		image_soup = soup.find_all("div", {"class" :"ico-wrap"})
 		if not image_soup:
 			image_soup = soup.find_all("a", {"class": "ico-wrap", "data-pos": "top"})
@@ -214,7 +220,7 @@ def get_image(source, url):
 		else:
 			imageURL = image_soup[0].img['src']
 
-	elif source == 'food.com':
+	elif source is 'food.com':
 		print "food.com image scrape"
 		image_soup = soup.find_all("div", {"class" : "trans-img"})
 		if not image_soup:
@@ -322,7 +328,7 @@ def printResults(ingList):
 		print str(i+1) + '. ' + str(recipeList[i].name) + ' - ' + str(recipeList[i].score) 
 		i += 1
 	
-def begin_recipe_searching(allowedIngredients, disallowedIngredients, courseTypes):
+def begin_recipe_searching(allowedIngredients, disallowedIngredients, courseTypes, inRush):
 	#credentials structure: _app_id=app-id&_app_key=app-key
 	global recipeList
 	global madeSearch
@@ -353,6 +359,9 @@ def begin_recipe_searching(allowedIngredients, disallowedIngredients, courseType
 	print "Calling Food Network"
 	searchParamenters = urlQuery + urlIngredients + urlXIngredients + urlCourseTypes + '&maxResult=6'
 	
+	if inRush:
+		searchParamenters += '&maxTotalTimeInSeconds=2100'
+	
 	url = 'http://api.yummly.com/v1/api/recipes?%s&%s' % (yummlyCredentials, searchParamenters)
 	results = process_request(url)
 
@@ -366,7 +375,8 @@ def begin_recipe_searching(allowedIngredients, disallowedIngredients, courseType
 	print "Calling AllRecipes"
 	urlQuery = "q=allrecipes"
 	searchParamenters = urlQuery + urlIngredients + urlXIngredients + urlCourseTypes + '&maxResult=6'
-	#print searchParamenters
+	if inRush:
+		searchParamenters += '&maxTotalTimeInSeconds=2100'
 	
 	url = 'http://api.yummly.com/v1/api/recipes?%s&%s' % (yummlyCredentials, searchParamenters)
 	results = process_request(url)
@@ -380,7 +390,8 @@ def begin_recipe_searching(allowedIngredients, disallowedIngredients, courseType
 	print "Calling Food.com"
 	urlQuery = "q=foodcom"
 	searchParamenters = urlQuery + urlIngredients + urlXIngredients + urlCourseTypes + '&maxResult=6'
-	#print searchParamenters
+	if inRush:
+		searchParamenters += '&maxTotalTimeInSeconds=2100'
 	
 	url = 'http://api.yummly.com/v1/api/recipes?%s&%s' % (yummlyCredentials, searchParamenters)
 	results = process_request(url)

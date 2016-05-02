@@ -48,7 +48,7 @@ $(function(){
             $('#letsCookDiv').remove("#error-message")
             $('#ingredient-form-incing').removeClass('has-error');
             $.ajax({
-                url: '/recipe-list',
+                url: '/recipe-list/0',
                 data: $('form').serialize(),
                 type: 'POST',
                 success: function(response){
@@ -72,19 +72,41 @@ $(function(){
         }
     });
 
-    $('#testRecipe').click(function(){
-        window.location = '/recipe-list/view';
-        // $.ajax({
-        //     url: '/recipe-list/view',
-        //     data: 'testing',
-        //     type: 'GET',
-        //     success: function(data, response){
-        //         console.log(response);
-        //         window.location = '/recipe-list/view';
-        //     },
-        //     error: function(error){
-        //         console.log(error);
-        //     }
-        // });
+    $('#inRush').click(function(){
+        var ingredients = [$('#ingredient1').val(),$('#ingredient2').val(),$('#ingredient3').val(),$('#ingredient4').val()];
+        var has_ingredients = false;
+        for (var i = 0; i < ingredients.length; i++) {
+            if(ingredients[i]){
+                has_ingredients = true;
+                break;
+            }
+        };
+
+        if(has_ingredients){
+            $('#letsCookDiv').remove("#error-message")
+            $('#ingredient-form-incing').removeClass('has-error');
+            $.ajax({
+                url: '/recipe-list/1',
+                data: $('form').serialize(),
+                type: 'POST',
+                success: function(response){
+                    console.log(response);
+                    window.location = '/recipe-list/view';
+                },
+                error: function(error){
+                    console.log(error);
+                }
+            });
+            loading();
+        }
+        else {
+            if ( $('#error-message').length ){
+                ;
+            }
+            else{
+                $('#letsCookDiv').append('<div style="margin-top: 5px;" id="error-message">Sorry, you need to add at least one ingredient, silly!</div>')
+            }
+            $('#ingredient-form-incing').addClass('has-error');
+        }
     });
 });
