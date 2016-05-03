@@ -71,7 +71,9 @@
     <div class="col-md-offset-1 col-md-4">
       <h2><u>Directions</u></h2>
       <h4>
-        {{recipe.directions}}
+        {% for direction in recipe.directions %}
+          <p>{{direction}}</p>
+        {% endfor %}
       </h4>
     </div>
   </div>
@@ -82,11 +84,9 @@
   </div>
   <hr>
   <div class="row">
-    <div class="col-md-4"></div>
-    <div class="col-md-5">
+    <div class="text-center">
       <button type="button" id="notForMe" onClick="window.history.back()" class="btn btn-danger btn-lg">Maybe not for me...</button>
       <a type="button" href="/" id="another" class="btn btn-success btn-lg">Delicious! Another!</a>
     </div>
-    <div class="col-md-3"></div>
   </div>
 </div>

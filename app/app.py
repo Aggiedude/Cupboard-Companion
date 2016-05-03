@@ -158,8 +158,13 @@ def flesch_kincaid_score(text):
 	sentenceCount = textstat.sentence_count(text)
 
 	print "Syl count - %s, word count - %s, sentenceCount - %s " % (sylCount,wordCount,sentenceCount)
+	value = 0
+	try:
+		value = (0.39*(wordCount/sentenceCount)+11.8*(sylCount/wordCount) - 15.59)
+	except:
+		value = 0
 
-	return (0.39*(wordCount/sentenceCount)+11.8*(sylCount/wordCount) - 15.59)
+	return value
 
 def ing_on_hand(onHand,inRecipe):
 	onHandList = []
@@ -182,25 +187,24 @@ def get_directions(source, url):
 	directions = ''
 
 	if "foodnetwork" in source:
-		direction_soup = soup.find_all(itemprop='recipeInstructions')[0].p
-		directions = direction_soup.get_text() + "\n"
-		siblings = direction_soup.find_next_siblings("p")
-		siblings = siblings[:-2]
-
-		for sibling in siblings:
-			directions += sibling.get_text() + "\n"
+		direction_soup = soup.find_all("ul", {"class" : "recipe-directions-list"})
+		for ul in direction_soup:
+			for li in ul.find_all('li'):
+				if "copyright" not in li.get_text().lower():
+					if "courtesy" not in li.get_text().lower():
+						directions += li.get_text() + '\n'
 			
 	elif "allrecipes" in source:
 		instruction_soup = soup.find_all("ol", {"class": "list-numbers recipe-directions__list"})
 		for ol in instruction_soup:
 			for li in ol.find_all('li'):
-				directions += li.find("span", {"class": "recipe-directions__list--item"}).get_text()
+				directions += li.find("span", {"class": "recipe-directions__list--item"}).get_text() + '\n'
 
 	elif "food.com" in source:
 		print "food.com directions scrape"
 		direction_soup = soup.find_all("div", {"class" : "directions"})
 		for li in direction_soup[0].find_all("ol"):
-			directions += li.get_text()
+			directions += li.get_text() + '\n'
 
 	return directions
 
@@ -211,24 +215,31 @@ def get_image(source, url):
 	soup = BeautifulSoup(page, "html.parser")
 
 	imageURL = ''
-	if source is 'foodnetwork':
-		image_soup = soup.find_all("div", {"class" :"ico-wrap"})
-		if not image_soup:
-			image_soup = soup.find_all("a", {"class": "ico-wrap", "data-pos": "top"})
-			if image_soup:
+	try:
+		if 'foodnetwork' in source:
+			print 'scraping image for foodnetwork'
+			image_soup = soup.find_all("div", {"class" :"ico-wrap"})
+			if not image_soup:
+				image_soup = soup.find_all("a", {"class": "ico-wrap", "data-pos": "top"})
+				if image_soup:
+					imageURL = image_soup[0].img['src']
+			else:
 				imageURL = image_soup[0].img['src']
-		else:
-			imageURL = image_soup[0].img['src']
 
-	elif source is 'food.com':
-		print "food.com image scrape"
-		image_soup = soup.find_all("div", {"class" : "trans-img"})
-		if not image_soup:
-			imageURL = ""
-		else:
-			imageURL = image_soup[0].img['data-src']
+		elif 'food.com' in source:
+			print 'scraping image for food.com'
+			image_soup = soup.find_all("div", {"class" : "trans-img"})
+			if not image_soup:
+				print 'NO ERROR - No image'
+				imageURL = ""
+			else:
+				imageURL = image_soup[0].img['data-src']
 
-	print imageURL
+		print imageURL
+
+	except:
+		print 'ERROR - No image'
+		imageURL = ''
 
 	return imageURL
 
@@ -247,14 +258,14 @@ def evaluate_recipe(allowedIngredients, recipe):
 
 	# currently, only Food Network sources work. 
 	if "Food Network" in sourceName:
-		directionsText = get_directions('foodnetwork',sourceURL)
-		imageSource = get_image('foodnetwork',sourceURL)
+		directionsText = get_directions('foodnetwork', sourceURL)
+		imageSource = get_image('foodnetwork', sourceURL)
 		print directionsText
 		print imageSource
 	elif "Food.com" in sourceName:
 		print "source name is food.com"
-		directionsText = get_directions('food.com',sourceURL)
-		imageSource = get_image('food.com',sourceURL)
+		directionsText = get_directions('food.com', sourceURL)
+		imageSource = get_image('food.com', sourceURL)
 		print directionsText
 		print imageSource
 	elif "AllRecipes" in sourceName:
@@ -293,7 +304,7 @@ def evaluate_recipe(allowedIngredients, recipe):
 		rec = Recipe(recipeName)
 		rec.addIngredient(mainIngredientRecipes[mainIngredientRecipes.index(recipe['id'])+1])
 		rec.addMeasuredIngredient(ingredientList)		
-		rec.addDirections(directionsText)
+		rec.addDirections([s.strip().encode('ascii', 'ignore') for s in directionsText.splitlines()])
 		rec.addImage(imageSource)
 		rec.addPrepTime(prepTimeProper)
 		rec.addCookTime(cookTimeProper)
@@ -313,7 +324,7 @@ def evaluate_simplicity(numIng, prepTime, cookTime, numMissingIngr, directionsTe
 	cookConst = 0.001
 	missingIngrConst = 2.0
 	fkConst = 0.5
-	stepsConst = 0.3
+	stepsConst = 0.2
 
 	fkScore = flesch_kincaid_score(directionsText)
 	numSteps = len([s.strip() for s in directionsText.splitlines()])
