@@ -345,13 +345,18 @@ def begin_recipe_searching(allowedIngredients, disallowedIngredients, courseType
 	urlCourseTypes = ''
 	for ing in allowedIngredients:
 		if ing:
+			ing = string.replace(ing, " ", "%20")
 			urlIngredients = urlIngredients + '&allowedIngredient[]=%s' % ing.strip()
-	for ing in disallowedIngredients:
-		if ing:
-			urlXIngredients = urlXIngredients + '&excludedIngredient[]=%s' % ing.strip()
+	for xing in disallowedIngredients:
+		if xing:
+			xing = string.replace(xing, " ", "%20")
+			urlXIngredients = urlXIngredients + '&excludedIngredient[]=%s' % xing.strip()
 	for course in courseTypes:
 		if course:
 			urlCourseTypes = urlCourseTypes + '&allowedCourse[]=course^course-%s' % ing.strip()
+
+	print str(urlIngredients)
+	print str(urlXIngredients)
 
 	completeRecipes = []
 
